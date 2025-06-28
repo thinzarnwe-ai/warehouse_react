@@ -1,47 +1,7 @@
 import React from "react";
-import { useState, useEffect } from "react";
 
-export default function Stock_List_sm() {
-  const [stocks, setStocks] = useState([]);
-  const [pagination, setPagination] = useState({
-    current_page: 1,
-    total: 0,
-    per_page: 10 ,
-  });
-
-  const fetchStockData = async (page = 1) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`/api/stock_active?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      // console.log(json.data.data)
-      setStocks(json.data.data);
-      setPagination({
-        current_page: json.data.current_page,
-        total: json.data.total,
-        per_page: json.data.per_page,
-      });
-    } catch (err) {
-      console.error("Failed to load stock data:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchStockData();
-  }, []);
-
-  const handlePageChange = (newPage) => {
-    // console.log("hello world");
-    fetchStockData(newPage);
-  };
+export default function Stock_List_sm({stocks, pagination, onPageChange}) {
+ 
   return (
     <>
       <div className="md:hidden space-y-4 px-4 pt-4 bg-primary">
@@ -58,27 +18,34 @@ export default function Stock_List_sm() {
               <div className="space-y-1">
                 <p className="text-sm text-gray-300">#{serial}</p>
                 <p className="text-lg font-bold text-white">
-                  {stock.product_code}
+                  {stock.stock_tracking.product_code}
                 </p>
                 <p className="text-sm text-white">{stock.product_name}</p>
                 <p className="text-sm text-white">
-                  📍 {stock.location_name}
+                  📍 {stock.stock_tracking.location_name}
                 </p>
                 <p className="text-sm text-white">
                   Qty:{" "}
                   <span className="text-[#fff] font-bold">
-                    {stock.total_qty}
+                    {stock.qty}
                   </span>
                 </p>
               </div>
 
               {/* Right Side */}
-              <div className="text-end space-y-1">
-                <span className="inline-block py-1 px-3 text-xs font-medium rounded-full bg-[#fff3e1] text-[#e20049] shadow-sm">
-                  Active
-                </span>
+              <div className="text-end space-y-1 w-25">
+                {/* <span className="inline-block py-1 px-3 text-xs font-medium rounded-xl bg-[#2a3d47] text-[#94edf3] border  border-[#94edf3]">
+                {stock.status}
+                </span> */}
+                <span className={`inline-block py-1 px-3 text-xs font-medium rounded-xl border 
+                ${stock.status === 'in' ? 'bg-white/10 text-[#ffda37] border-[#fad017] border-2' : 
+                  stock.status === 'out' ? 'bg-white/15 text-[#d32518] border-2  border-[#b95548]' : 
+                  'bg-[#2a3d47] text-[#94edf3] border-[#94edf3]'}`}>
+                {stock.status}
+              </span>
+
                 <p className="text-sm font-medium text-gray-200">
-                  {new Date(stock.created_at).toLocaleDateString()}
+                   {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric',hour: '2-digit',minute: '2-digit'})}
                 </p>
               </div>
             </div>
@@ -86,10 +53,10 @@ export default function Stock_List_sm() {
         })}
       </div>
 
-      <div className="mt-6 flex justify-center gap-4">
+         <div className="mt-6 flex justify-center gap-4">
         <button
           disabled={pagination.current_page === 1}
-          onClick={() => handlePageChange(pagination.current_page - 1)}
+          onClick={() => onPageChange(pagination.current_page - 1)}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Previous
@@ -102,7 +69,7 @@ export default function Stock_List_sm() {
           disabled={
             pagination.current_page * pagination.per_page >= pagination.total
           }
-          onClick={() => handlePageChange(pagination.current_page + 1)}
+          onClick={() => onPageChange(pagination.current_page + 1)}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Next

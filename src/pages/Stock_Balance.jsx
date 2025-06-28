@@ -1,10 +1,10 @@
 import React from "react";
 import Stock_List_md from "../components/Stock_List_md";
-import Stock_List_sm from "../components/Stock_List_sm";
-import Search from "../components/Search";
+import Stock_Balance_sm from "../components/Stock_Balance_sm";
+import Search_Balance_Stock from "../components/Search_Balance_Stock";
 import { useEffect, useState } from "react";
 
-export default function Home() {
+export default function Stock_Balance() {
 const [stocks, setStocks] = useState([]);
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -14,7 +14,7 @@ const [stocks, setStocks] = useState([]);
 
   const [searchFilters, setSearchFilters] = useState({
     product_code: '',
-    status: '',
+    location_name: '',
   });
 
   const fetchStockData = async (page = 1) => {
@@ -24,10 +24,10 @@ const [stocks, setStocks] = useState([]);
       const params = new URLSearchParams({
         page: page.toString(),
         product_code: searchFilters.product_code || '',
-        status: searchFilters.status || '',
+        location_name: searchFilters.location_name || '',
       });
 
-      const res = await fetch(`/api/show_all_stock?${params.toString()}`, {
+      const res = await fetch(`/api/stock_active?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
@@ -51,16 +51,16 @@ const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
     fetchStockData();
-  }, [searchFilters]); 
+  }, [searchFilters]); // Refetch when search filters change
 
   const handlePageChange = (newPage) => {
     fetchStockData(newPage);
   };
   return (
     <>
-      <Search filters={searchFilters} setFilters={setSearchFilters}/>
+      <Search_Balance_Stock filters={searchFilters} setFilters={setSearchFilters}/>
       <Stock_List_md/>
-      <Stock_List_sm  stocks={stocks}
+      <Stock_Balance_sm  stocks={stocks}
         pagination={pagination}
         onPageChange={handlePageChange}/>
     </>

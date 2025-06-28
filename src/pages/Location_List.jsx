@@ -15,32 +15,34 @@ export default function LocationList() {
     per_page: 10,
   });
 
-  const printRef = useRef(null);
+  const handlePrint = useReactToPrint({
+    contentRef: componentRef,
+    documentTitle: "Selected_Locations",
+    removeAfterPrint: true,
+  });
+
 
   const isSelected = useCallback(
     (id) => selectedLocations.some((l) => l.id === id),
     [selectedLocations]
   );
 
-  const handleSelect = useCallback((location) => {
-    setSelectedLocations((prev) =>
-      isSelected(location.id)
-        ? prev.filter((l) => l.id !== location.id)
-        : [...prev, location]
-    );
-  }, [isSelected]);
+  const handleSelect = useCallback(
+    (location) => {
+      setSelectedLocations((prev) =>
+        isSelected(location.id)
+          ? prev.filter((l) => l.id !== location.id)
+          : [...prev, location]
+      );
+    },
+    [isSelected]
+  );
 
   const handleSelectAll = () => {
     setSelectedLocations((prev) =>
       prev.length === locations.length ? [] : [...locations]
     );
   };
-
-  const handlePrint = useReactToPrint({
-    content: () => printRef.current,
-    documentTitle: "Selected_Locations",
-    removeAfterPrint: true,
-  });
 
   const fetchLocationData = async (page = 1) => {
     try {
@@ -111,7 +113,9 @@ export default function LocationList() {
               onClick={handleSelectAll}
               className="w-full mt-2 bg-[#107a8b] text-white py-2 rounded-lg hover:bg-[#0d6e7b]"
             >
-              {selectedLocations.length === locations.length ? "Unselect All" : "Select All"}
+              {selectedLocations.length === locations.length
+                ? "Unselect All"
+                : "Select All"}
             </button>
           </div>
         </div>
@@ -119,7 +123,12 @@ export default function LocationList() {
           to="/create_location"
           className="bg-primary py-2 px-3 text-white rounded ml-4"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-6 h-6">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            className="w-6 h-6"
+          >
             <path
               fillRule="evenodd"
               d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
@@ -155,19 +164,20 @@ export default function LocationList() {
         </div>
 
         {/* Print Button */}
+
         {selectedLocations.length > 0 && (
-          <div className="text-end">
+          <div className="fixed bottom-10 right-10">
             <button
+              className="bg-[#128080] text-white px-8 py-3 rounded-lg text-lg font-medium shadow hover:bg-[#0d6e7b]"
               onClick={handlePrint}
-              className="bg-[#107a8b] text-white px-6 py-2 rounded-lg shadow hover:bg-[#0d6e7b]"
             >
               Print Selected
             </button>
           </div>
         )}
-
-        {/* Hidden Printable Content */}
-        <div ref={componentRef} style={{ position: "absolute", left: "-9999px", top: 0 }}>
+      </div>
+      <div className="hidden">
+        <div ref={componentRef}>
           <div className="p-4 w-[800px]">
             <h2 className="text-xl font-bold mb-4 text-black">Selected Locations</h2>
             <div className="grid grid-cols-2 gap-4">
@@ -184,6 +194,7 @@ export default function LocationList() {
           </div>
         </div>
       </div>
+      
 
       {/* Pagination */}
       <div className="mt-6 flex justify-center gap-4">

@@ -1,21 +1,14 @@
 import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
-import {
-  Html5Qrcode,
-  Html5QrcodeSupportedFormats,
-  Html5QrcodeScanType,
-} from "html5-qrcode";
+import { useStockForm } from "../custom_hooks/useStockForm";
 import { useNavigate } from "react-router-dom";
 
-export default function Create() {
-  const [branches, setBranches] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Create_StockIn() {
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanningTarget, setScanningTarget] = useState(null);
-  const qrRegionId = "qr-reader";
+  const [errors, setErrors] = useState({});
   const navigate = useNavigate();
+  const qrRegionId = "qr-reader";
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -24,52 +17,18 @@ export default function Create() {
     remark: "",
   });
 
-  const startScan = async (field) => {
-    setScanningTarget(field);
-    setIsScanning(true);
-
-    setTimeout(async () => {
-      const html5QrCode = new Html5Qrcode(qrRegionId);
-      const cameras = await Html5Qrcode.getCameras();
-
-      if (cameras && cameras.length) {
-        html5QrCode.start(
-          cameras[0].id,
-          {
-            fps: 10,
-            qrbox: 300,
-            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-            formatsToSupport: [
-              Html5QrcodeSupportedFormats.QR_CODE,
-              Html5QrcodeSupportedFormats.CODE_128,
-              Html5QrcodeSupportedFormats.CODE_39,
-              Html5QrcodeSupportedFormats.EAN_13,
-              Html5QrcodeSupportedFormats.EAN_8,
-              Html5QrcodeSupportedFormats.UPC_A,
-              Html5QrcodeSupportedFormats.UPC_E,
-              Html5QrcodeSupportedFormats.ITF,
-            ],
-          },
-
-          (decodedText) => {
-            // console.log(decodedText);
-            setForm((prev) => ({
-              ...prev,
-              [field === "location" ? "location_name" : "product_code"]:
-                decodedText,
-            }));
-            html5QrCode.stop().then(() => {
-              html5QrCode.clear();
-              setIsScanning(false);
-            });
-          },
-          (error) => {
-            console.error("Failed to load data:", error);
-          }
-        );
-      }
-    }, 200);
-  };
+  const { branches, loadingBranches, isScanning, scanningTarget, startScan } =
+    useStockForm({
+      form,
+      setForm,
+      selectedBranch,
+      enableProductFetch: false,
+    });
+  useEffect(() => {
+    if (branches.length > 0 && !selectedBranch) {
+      setSelectedBranch(branches[0]);
+    }
+  }, [branches]);
 
   useEffect(() => {
     const fetchProductName = async () => {
@@ -95,7 +54,7 @@ export default function Create() {
           product_name: productName,
         }));
       } catch (err) {
-        console.warn("Failed to fetch product name:", err);
+        // console.warn("Failed to fetch product name:", err);
         setForm((prev) => ({
           ...prev,
           product_name: "",
@@ -106,36 +65,6 @@ export default function Create() {
     fetchProductName();
   }, [form.product_code]);
 
-  useEffect(() => {
-    const fetchBranches = async () => {
-      const token = localStorage.getItem("token");
-
-      try {
-        const response = await fetch("/api/user-branch", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await response.json();
-
-        const formatted = data.data.map((branch) => ({
-          value: branch.id,
-          label: branch.name,
-        }));
-
-        setBranches(formatted);
-      } catch (error) {
-        console.error("Failed to fetch branches", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBranches();
-  }, []);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
@@ -143,7 +72,7 @@ export default function Create() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    setErrors({});
     const token = localStorage.getItem("token");
     try {
       const res = await fetch("/api/stock_tracking_in", {
@@ -160,13 +89,15 @@ export default function Create() {
 
       const result = await res.json();
       if (res.ok) {
-        toast.success("Stock In saved successfully ✅");
+        toast.success("Stock In saved successfully.");
         navigate("/stock_in_lists");
       } else {
-        toast.error(result.message || "Something went wrong.");
+        if (result.errors) {
+          setErrors(result.errors);
+        }
+        toast.error(result.message || "Validation failed.");
       }
     } catch (error) {
-      console.error("Submit error:", error);
       toast.error("An error occurred while saving form.");
     }
   };
@@ -196,9 +127,9 @@ export default function Create() {
             <div className="sm:col-span-3">
               <label
                 htmlFor="branch"
-                className="block text-sm font-medium text-gray-900"
+                className="block text-sm font-medium text-primary"
               >
-                Branch
+                Branch <span className="text-red-600">*</span>
               </label>
               <div className="mt-2">
                 <Select
@@ -207,7 +138,7 @@ export default function Create() {
                   options={branches}
                   value={selectedBranch}
                   onChange={setSelectedBranch}
-                  isLoading={loading}
+                  isLoading={loadingBranches}
                   placeholder="Select a branch"
                   className="text-sm w-full border border-primary"
                   classNamePrefix="react-select"
@@ -219,9 +150,9 @@ export default function Create() {
             <div className="sm:col-span-3">
               <label
                 htmlFor="location_name"
-                className="block text-sm font-medium text-gray-900"
+                className="block text-sm font-medium text-primary"
               >
-                Location
+                Location <span className="text-red-600">*</span>
               </label>
               <div className="flex gap-5">
                 <input
@@ -251,15 +182,18 @@ export default function Create() {
                   </svg>
                 </button>
               </div>
+              {errors.location_name && (
+                <p className="text-red-500">{errors.location_name[0]}</p>
+              )}
             </div>
 
             {/* Product Code */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="product_code"
-                className="block text-sm font-medium text-gray-900"
+                className="block text-sm font-medium text-primary"
               >
-                Product Code
+                Product Code <span className="text-red-600">*</span>
               </label>
               <div className="flex gap-5">
                 <input
@@ -271,6 +205,7 @@ export default function Create() {
                 />
                 <button
                   className="border-2 px-1 rounded border-primary"
+                  type="button"
                   onClick={() => startScan("product")}
                 >
                   <svg
@@ -287,15 +222,18 @@ export default function Create() {
                   </svg>
                 </button>
               </div>
+              {errors.product_code && (
+                <p className="text-red-500">{errors.product_code[0]}</p>
+              )}
             </div>
 
             {/* Product Name */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="product_name"
-                className="block text-sm font-medium text-gray-900"
+                className="block text-sm font-medium text-primary"
               >
-                Product Name
+                Product Name <span className="text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -304,23 +242,32 @@ export default function Create() {
                 onChange={handleInputChange}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
               />
+              {errors.product_name && (
+                <p className="text-red-500">{errors.product_name[0]}</p>
+              )}
             </div>
 
             {/* Quantity */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="qty"
-                className="block text-sm font-medium text-gray-900"
+                className="block text-sm font-medium text-primary"
               >
-                Add Quantity
+                Add Quantity <span className="text-red-600">*</span>
               </label>
               <input
                 type="number"
                 name="qty"
+                min="0"
                 value={form.qty}
                 onChange={handleInputChange}
+                onKeyDown={(e) => {
+                  if (e.key === "-" || e.key === "e" || e.key === "+")
+                    e.preventDefault();
+                }}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
               />
+              {errors.qty && <p className="text-red-500">{errors.qty[0]}</p>}
             </div>
 
             {/* Remark */}
@@ -329,7 +276,7 @@ export default function Create() {
                 htmlFor="remark"
                 className="block text-sm font-medium text-primary"
               >
-                Remark
+                Reason <span className="text-red-600">*</span>
               </label>
               <textarea
                 name="remark"
@@ -338,13 +285,17 @@ export default function Create() {
                 rows="5"
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
               />
+              {errors.remark && (
+                <p className="text-red-500">{errors.remark[0]}</p>
+              )}
             </div>
+            
 
             {/* Submit Button */}
             <div className="flex items-center justify-end gap-x-6 w-full">
               <button
                 type="submit"
-                className="rounded-md bg-primary px-6 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500"
+                className="rounded-md bg-primary px-10 py-3 text-md font-semibold text-white shadow hover:bg-[#6ac9c9]"
               >
                 Save
               </button>

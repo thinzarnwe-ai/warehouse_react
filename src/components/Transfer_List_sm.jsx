@@ -1,59 +1,9 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { useStateContext } from "../contexts/AppContext";
 
-export default function Transfer_List_sm() {
-  const [stocks, setStocks] = useState([]);
-    const { user } = useStateContext();
-  const [pagination, setPagination] = useState({
-    current_page: 1,
-    total: 0,
-    per_page: 10,
-  });
-  const defaultUser = {
-    name: "Unknown",
-    emp_id: "unknown",
-    roles: "Test",
-  };
-
-  const userInfo = user?.user || defaultUser;
-// console.log(userInfo);
-  const fetchStockData = async (page = 1) => {
-    try {
-      const token = localStorage.getItem("token");
-      const res = await fetch(`/api/stock_tracking_transfer?page=${page}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        credentials: "include",
-      });
-
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      // console.log(json.data.data)
-      setStocks(json.data.data);
-      setPagination({
-        current_page: json.data.current_page,
-        total: json.data.total,
-        per_page: json.data.per_page,
-      });
-    } catch (err) {
-      console.error("Failed to load stock data:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchStockData();
-  }, []);
-
-  const handlePageChange = (newPage) => {
-    // console.log("hello world");
-    fetchStockData(newPage);
-  };
+export default function Transfer_List_sm({ stocks, pagination, onPageChange }) {
   return (
     <>
-         <div className="md:hidden space-y-4 px-4 py-4 bg-primary">
+      <div className="md:hidden space-y-4 px-4 py-4 bg-primary">
         {stocks.map((stock, index) => {
           const serial =
             (pagination.current_page - 1) * pagination.per_page + index + 1;
@@ -75,7 +25,7 @@ export default function Transfer_List_sm() {
                 <p className="text-sm text-white">
                   📍 {stock.stock_tracking.location_name}
                 </p>
-                 <p className="text-sm text-white font-bold">
+                <p className="text-sm text-white font-bold">
                   📍 {stock.transfer_location}
                 </p>
                 <p className="text-sm text-white">
@@ -85,12 +35,21 @@ export default function Transfer_List_sm() {
               </div>
 
               {/* Right Side */}
-              <div className="text-end space-y-1">
-                <span className="inline-block py-1 px-3 text-xs font-medium rounded-full bg-[#fff3e1] text-[#e20049] shadow-sm">
+              <div className="text-end space-y-1 w-25 ">
+                <span
+                  className="inline-block py-1 px-3 text-xs font-medium rounded-xl bg-[#2a3d47] text-[#94edf3] border  border-[#94edf3]"
+                  style={{ textTransform: "capitalize" }}
+                >
                   {stock.status}
                 </span>
                 <p className="text-sm font-medium text-gray-200">
-                  {new Date(stock.created_at).toLocaleDateString()}
+                  {new Date(stock.created_at).toLocaleDateString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
                 </p>
               </div>
             </div>
@@ -98,24 +57,23 @@ export default function Transfer_List_sm() {
         })}
       </div>
 
-
       <div className="mt-6 flex justify-center gap-4">
         <button
           disabled={pagination.current_page === 1}
-          onClick={() => handlePageChange(pagination.current_page - 1)}
+          onClick={() => onPageChange(pagination.current_page - 1)}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Previous
         </button>
         <p className="text-sm text-gray-600 text-center mt-2">
-        Page {pagination.current_page}
-      </p>
+          Page {pagination.current_page}
+        </p>
 
         <button
           disabled={
             pagination.current_page * pagination.per_page >= pagination.total
           }
-          onClick={() => handlePageChange(pagination.current_page + 1)}
+          onClick={() => onPageChange(pagination.current_page + 1)}
           className="px-4 py-2 bg-gray-200 rounded disabled:opacity-50"
         >
           Next

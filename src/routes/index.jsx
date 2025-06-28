@@ -13,6 +13,8 @@ import Create_Transfer from "../pages/Create_Transfer.jsx";
 import Location_List from "../pages/Location_List.jsx";
 import ProfilePage from "../pages/ProfilePage.jsx";
 import Create_Location from "../pages/Create_Location.jsx";
+import Stock_Balance from "../pages/Stock_Balance.jsx";
+import ScanPage from "../pages/ScanPage.jsx";
 
   const router = createBrowserRouter([
     {
@@ -58,7 +60,15 @@ import Create_Location from "../pages/Create_Location.jsx";
         {
           path: "/locations",
           element: <Location_List/>
-        }
+        },
+          {
+          path: "/stock_balance_lists",
+          element: <Stock_Balance/>
+          },
+          {
+            path: "/scan/:target",
+            element: <ScanPage/>
+          }
       ]
 
     },

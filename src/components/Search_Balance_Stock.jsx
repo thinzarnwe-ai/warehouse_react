@@ -32,27 +32,23 @@ export default function Search({filters, setFilters}) {
           />
         </div>
 
-        {/* Status Radios */}
+          {/* Location Name Input */}
         <div className="w-full md:w-1/2">
-          <label className="text-sm font-semibold text-white block">
-            Status
+          <label
+            htmlFor="locaton_name"
+            className="text-sm font-semibold text-white block"
+          >
+           Location Name
           </label>
-        <div className="flex items-center gap-8 mt-3">
-        {['in', 'out', 'Transfer In', 'Transfer Out'].map((status) => (
-          <label key={status} className="flex items-center gap-2 text-sm font-medium text-white">
-            <input
-              type="radio"
-              name="status"
-              value={status}
-              checked={filters.status === status}
-              onChange={handleChange}
-              className="accent-[#107a8b] w-4 h-4"
-            />
-            {status.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase())}
-          </label>
-        ))}
-      </div>
-
+          <input
+            id="location_name"
+            type="text"
+            name="location_name"
+            value={filters.location_name}
+            onChange={handleChange}
+            placeholder="Enter location name"
+            className="mt-2 w-full py-3 px-4 border border-[#107a8b] rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#107a8b]"
+          />
         </div>
       </div>
     </>
