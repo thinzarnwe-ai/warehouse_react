@@ -21,7 +21,6 @@ export default function LocationList() {
     removeAfterPrint: true,
   });
 
-
   const isSelected = useCallback(
     (id) => selectedLocations.some((l) => l.id === id),
     [selectedLocations]
@@ -63,14 +62,16 @@ export default function LocationList() {
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
+      const locationArray = Object.values(json.data);
+      setLocations(locationArray);
 
-      setLocations(json.data.data);
       setPagination({
-        current_page: json.data.current_page,
-        total: json.data.total,
-        per_page: json.data.per_page,
+        current_page: json.current_page ?? 1,
+        total: json.total ?? locationArray.length,
+        per_page: json.per_page ?? locationArray.length,
       });
-      setSelectedLocations([]); // Reset selection on filter change
+
+      setSelectedLocations([]);
     } catch (err) {
       console.error("Failed to load location data:", err);
     }
@@ -83,7 +84,6 @@ export default function LocationList() {
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);
   };
-
   return (
     <>
       <div className="flex justify-between items-center me-2 md:me-5 shadow p-4">
@@ -179,14 +179,18 @@ export default function LocationList() {
       <div className="hidden">
         <div ref={componentRef}>
           <div className="p-4 w-[800px]">
-            <h2 className="text-xl font-bold mb-4 text-black">Selected Locations</h2>
+            <h2 className="text-xl font-bold mb-4 text-black">
+              Selected Locations
+            </h2>
             <div className="grid grid-cols-2 gap-4">
               {selectedLocations.map((location) => (
                 <div
                   key={location.id}
                   className="border p-4 rounded-md shadow bg-white flex justify-between items-center"
                 >
-                  <div className="font-bold text-black">{location.location_name}</div>
+                  <div className="font-bold text-black">
+                    {location.location_name}
+                  </div>
                   <QRCode value={location.location_name} size={64} />
                 </div>
               ))}
@@ -194,7 +198,6 @@ export default function LocationList() {
           </div>
         </div>
       </div>
-      
 
       {/* Pagination */}
       <div className="mt-6 flex justify-center gap-4">

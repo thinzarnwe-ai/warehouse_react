@@ -7,7 +7,6 @@ import { useStockForm } from "../custom_hooks/useStockForm";
 export default function Create_StockOut() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [errors, setErrors] = useState({});
-  const qrRegionId = "qr-reader";
   const navigate = useNavigate();
   const SUGGESTIONS = [
     { value: "Promotion", label: "Promotion" },
@@ -30,10 +29,26 @@ export default function Create_StockOut() {
     locationOptions,
     selectedLocation,
     setSelectedLocation,
-    isScanning,
-    scanningTarget,
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
+
+    //Scan QR / Bar Code
+  useEffect(() => {
+  
+    const scannedData = sessionStorage.getItem("scannedData");
+    const scanTarget = sessionStorage.getItem("scanTarget");
+  
+    if (scannedData && scanTarget) {
+      setForm((prev) => ({
+        ...prev,
+        [scanTarget === "location" ? "location_name" : "product_code"]: scannedData,
+      }));
+  
+      sessionStorage.removeItem("scannedData");
+      sessionStorage.removeItem("scanTarget");
+    }
+  }, [location]);
+  
 
   //branch selected
   useEffect(() => {
@@ -98,18 +113,6 @@ export default function Create_StockOut() {
         <div className="md:h-15 h-15 flex items-end justify-center rounded">
           <h2 className="text-2xl font-bold text-white">Stock Out Form</h2>
         </div>
-        {isScanning && (
-          <div className="my-4">
-            <p className="font-medium text-sm mb-2 text-gray-700">
-              Scanning{" "}
-              {scanningTarget === "location" ? "Location" : "Product Code"}...
-            </p>
-            <div
-              id={qrRegionId}
-              className="w-full max-w-xs mx-auto border rounded p-2"
-            />
-          </div>
-        )}
 
         <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import { useStockForm } from "../custom_hooks/useStockForm";
@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 export default function Create_StockOut() {
   const [errors, setErrors] = useState({});
   const [selectedBranch, setSelectedBranch] = useState(null);
-  const qrRegionId = "qr-reader";
   const navigate = useNavigate();
   const [form, setForm] = useState({
     location_name: "",
@@ -25,22 +24,53 @@ export default function Create_StockOut() {
     locationOptions,
     selectedLocation,
     setSelectedLocation,
-    isScanning,
-    scanningTarget,
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
-  
-    useEffect(() => {
-      if (branches.length > 0 && !selectedBranch) {
-        setSelectedBranch(branches[0]);
+
+  //Scan QR / Bar Code
+  useEffect(() => {
+    const draft = sessionStorage.getItem("formDraft");
+    if (draft) {
+      // setForm(JSON.parse(draft));
+      const parsedDraft = JSON.parse(draft);
+      setForm(parsedDraft);
+      const matchedOption = locationOptions.find(
+        (opt) => opt.value === parsedDraft.location_name
+      );
+      // console.log(draft.location_name);
+      if (matchedOption) {
+        setSelectedLocation(matchedOption);
       }
-    }, [branches]);
+    }
+
+    const scannedData = sessionStorage.getItem("scannedData");
+    const scanTarget = sessionStorage.getItem("scanTarget");
+
+    if (scannedData && scanTarget) {
+      setForm((prev) => ({
+        ...prev,
+        [scanTarget === "location" ? "transfer_location" : "product_code"]:
+          scannedData,
+      }));
+
+      sessionStorage.removeItem("scannedData");
+      sessionStorage.removeItem("scanTarget");
+    }
+  }, [location, locationOptions]);
+
+  //branch selected
+  useEffect(() => {
+    if (branches.length > 0 && !selectedBranch) {
+      setSelectedBranch(branches[0]);
+    }
+  }, [branches]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  //Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,6 +93,7 @@ export default function Create_StockOut() {
       if (res.ok) {
         toast.success("Transfer saved successfully ");
         navigate("/transfer_lists");
+         sessionStorage.removeItem("formDraft");
       } else {
         if (result.errors) {
           setErrors(result.errors);
@@ -80,18 +111,6 @@ export default function Create_StockOut() {
         <div className="md:h-15 h-15 flex items-end justify-center rounded">
           <h2 className="text-2xl font-bold text-white">Change Location</h2>
         </div>
-        {isScanning && (
-          <div className="my-4">
-            <p className="font-medium text-sm mb-2 text-gray-700">
-              Scanning{" "}
-              {scanningTarget === "location" ? "Location" : "Product Code"}...
-            </p>
-            <div
-              id={qrRegionId}
-              className="w-full max-w-xs mx-auto border rounded p-2"
-            />
-          </div>
-        )}
 
         <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">

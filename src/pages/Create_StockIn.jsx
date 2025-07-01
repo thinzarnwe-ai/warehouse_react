@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import { useStockForm } from "../custom_hooks/useStockForm";
-import { useNavigate } from "react-router-dom";
+import { useNavigate,useLocation } from "react-router-dom";
 
 export default function Create_StockIn() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
-  const qrRegionId = "qr-reader";
+  const location = useLocation();
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -17,19 +17,44 @@ export default function Create_StockIn() {
     remark: "",
   });
 
-  const { branches, loadingBranches, isScanning, scanningTarget, startScan } =
+  const { branches, loadingBranches, startScan } =
     useStockForm({
       form,
       setForm,
       selectedBranch,
       enableProductFetch: false,
     });
+
+    //Scan Qr or Bar code
+  useEffect(() => {
+    const draft = sessionStorage.getItem("formDraft");
+    if (draft) {
+      setForm(JSON.parse(draft));
+    }
+
+    const scannedData = sessionStorage.getItem("scannedData");
+    const scanTarget = sessionStorage.getItem("scanTarget");
+
+    if (scannedData && scanTarget) {
+      setForm((prev) => ({
+        ...prev,
+        [scanTarget === "location" ? "location_name" : "product_code"]: scannedData,
+      }));
+
+      sessionStorage.removeItem("scannedData");
+      sessionStorage.removeItem("scanTarget");
+    }
+  }, [location]);
+
+  //Branch Selected
   useEffect(() => {
     if (branches.length > 0 && !selectedBranch) {
       setSelectedBranch(branches[0]);
     }
   }, [branches]);
 
+
+  //porduct fetch
   useEffect(() => {
     const fetchProductName = async () => {
       const code = form.product_code?.trim();
@@ -70,6 +95,7 @@ export default function Create_StockIn() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  //form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrors({});
@@ -91,6 +117,7 @@ export default function Create_StockIn() {
       if (res.ok) {
         toast.success("Stock In saved successfully.");
         navigate("/stock_in_lists");
+        sessionStorage.removeItem("formDraft");
       } else {
         if (result.errors) {
           setErrors(result.errors);
@@ -108,19 +135,6 @@ export default function Create_StockIn() {
         <div className="md:h-15 h-15 flex items-end justify-center rounded">
           <h2 className="text-2xl font-bold text-white">Stock In Form</h2>
         </div>
-        {isScanning && (
-          <div className="my-4">
-            <p className="font-medium text-sm mb-2 text-gray-700">
-              Scanning{" "}
-              {scanningTarget === "location" ? "Location" : "Product Code"}...
-            </p>
-            <div
-              id={qrRegionId}
-              className="w-full max-w-xs mx-auto border rounded p-2"
-            />
-          </div>
-        )}
-
         <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             {/* Branch Select */}

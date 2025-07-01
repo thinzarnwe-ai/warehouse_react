@@ -1,70 +1,25 @@
 import { useEffect, useState } from "react";
-import {
-  Html5Qrcode,
-  Html5QrcodeScanType,
-  Html5QrcodeSupportedFormats,
-} from "html5-qrcode";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export function useStockForm({
   form,
   setForm,
   selectedBranch,
-  qrRegionId = "qr-reader",
   enableProductFetch = true,
 }) {
   const [branches, setBranches] = useState([]);
   const [loadingBranches, setLoadingBranches] = useState(true);
   const [locationOptions, setLocationOptions] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [scanningTarget, setScanningTarget] = useState(null);
+   const navigate = useNavigate();
 
   // QR SCAN LOGIC
-  const startScan = async (field) => {
-    setScanningTarget(field);
-    setIsScanning(true);
+  const startScan = (field) => {
+  sessionStorage.setItem("formDraft", JSON.stringify(form));
+  navigate(`/scan/${field}`);
+};
 
-    setTimeout(async () => {
-      const html5QrCode = new Html5Qrcode(qrRegionId);
-      const cameras = await Html5Qrcode.getCameras();
-
-      if (cameras && cameras.length) {
-        html5QrCode.start(
-          cameras[0].id,
-          {
-            fps: 10,
-            qrbox: 300,
-            supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA],
-            formatsToSupport: [
-              Html5QrcodeSupportedFormats.QR_CODE,
-              Html5QrcodeSupportedFormats.CODE_128,
-              Html5QrcodeSupportedFormats.CODE_39,
-              Html5QrcodeSupportedFormats.EAN_13,
-              Html5QrcodeSupportedFormats.EAN_8,
-              Html5QrcodeSupportedFormats.UPC_A,
-              Html5QrcodeSupportedFormats.UPC_E,
-              Html5QrcodeSupportedFormats.ITF,
-            ],
-          },
-          (decodedText) => {
-            setForm((prev) => ({
-              ...prev,
-              [field === "location" ? "location_name" : "product_code"]:
-                decodedText,
-            }));
-            html5QrCode.stop().then(() => {
-              html5QrCode.clear();
-              setIsScanning(false);
-            });
-          },
-          (err) => {
-            console.error("QR Scan Error", err);
-          }
-        );
-      }
-    }, 200);
-  };
 
   // FETCH BRANCHES
   useEffect(() => {
@@ -118,7 +73,7 @@ export function useStockForm({
         const results = json?.data?.[0] || [];
 
         if (!Array.isArray(results) || results.length === 0) {
-          toast.error("Product not found.");
+          // toast.error("Product not found.");
           setForm((prev) => ({
             ...prev,
             product_name: "",
@@ -159,8 +114,6 @@ export function useStockForm({
     locationOptions,
     selectedLocation,
     setSelectedLocation,
-    isScanning,
-    scanningTarget,
     startScan,
   };
 }

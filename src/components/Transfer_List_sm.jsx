@@ -22,10 +22,10 @@ export default function Transfer_List_sm({ stocks, pagination, onPageChange }) {
                 <p className="text-sm text-white">
                   {stock.stock_tracking.product_name}
                 </p>
-                <p className="text-sm text-white">
+                <p className="text-sm text-white ">
                   📍 {stock.stock_tracking.location_name}
                 </p>
-                <p className="text-sm text-white font-bold">
+                <p className="text-sm text-white">
                   📍 {stock.transfer_location}
                 </p>
                 <p className="text-sm text-white">
