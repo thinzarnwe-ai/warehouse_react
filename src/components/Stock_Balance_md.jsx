@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Stock_List_md({stocks, pagination, onPageChange}) {
+export default function Stock_Balance_md({stocks, pagination, onPageChange}) {
   
   return (
     <>
@@ -40,13 +40,13 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
               >
                 {serial}
               </th>
-              <td className="px-6 py-5">{stock.stock_tracking.product_code}</td>
-              <td className="px-6 py-5">{stock.stock_tracking.product_name}</td>
-              <td className="px-6 py-5">{stock.stock_tracking.location_name}</td>
-              <td className="px-6 py-5">{stock.qty}</td>
+              <td className="px-6 py-5">{stock.product_code}</td>
+              <td className="px-6 py-5">{stock.product_name}</td>
+              <td className="px-6 py-5">{stock.location_name}</td>
+              <td className="px-6 py-5">{stock.total_qty}</td>
               <td className="px-6 py-5 ">
                 <span className="py-1 px-2 rounded-full text-white bg-primary">
-                  {stock.status}
+                  Active
                 </span>
               </td>
             </tr>

@@ -190,39 +190,7 @@ export default function Create_StockOut() {
               />
             </div>
 
-            <div className="sm:col-span-3">
-              <label className="block text-sm font-medium text-primary">
-                From Location
-              </label>
-              <Select
-                options={locationOptions}
-                value={selectedLocation}
-                onChange={(selected) => {
-                  setSelectedLocation(selected);
-                  setForm((prev) => ({
-                    ...prev,
-                    location_name: selected?.value || "",
-                    qty: selected?.qty || "",
-                  }));
-                }}
-                placeholder="Select location"
-                className="border border-primary"
-                isClearable
-              />
-              {errors.location_name && (
-                <p className="text-red-500">{errors.location_name[0]}</p>
-              )}
-            </div>
-
-            <input
-              type="number"
-              name="qty"
-              value={form.qty}
-              readOnly
-              className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
-            />
-
-            {/* Location */}
+               {/* Location */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="transfer_location"
@@ -262,6 +230,40 @@ export default function Create_StockOut() {
                 <p className="text-red-500">{errors.transfer_location[0]}</p>
               )}
             </div>
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-primary">
+                From Location
+              </label>
+              <Select
+                options={locationOptions}
+                value={selectedLocation}
+                onChange={(selected) => {
+                  setSelectedLocation(selected);
+                  setForm((prev) => ({
+                    ...prev,
+                    location_name: selected?.value || "",
+                    qty: selected?.qty || "",
+                  }));
+                }}
+                placeholder="Select location"
+                className="border border-primary"
+                isClearable
+              />
+              {errors.location_name && (
+                <p className="text-red-500">{errors.location_name[0]}</p>
+              )}
+            </div>
+
+            <input
+              type="number"
+              name="qty"
+              value={form.qty}
+              readOnly
+              className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
+            />
+
+         
 
             {/* Quantity */}
             <div className="sm:col-span-3">

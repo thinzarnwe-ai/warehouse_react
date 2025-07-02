@@ -61,7 +61,10 @@ export default function Transfer_List() {
   return (
     <>
         <StockSearch  filters={searchFilters} setFilters={setSearchFilters}/>
-        <Transfer_List_md/>
+        <Transfer_List_md
+         stocks={stocks}
+          pagination={pagination}
+          onPageChange={handlePageChange}/>
         <Transfer_List_sm
          stocks={stocks}
           pagination={pagination}

@@ -58,7 +58,7 @@ export default function StockSearch({ filters, setFilters }) {
         </div>
       </div>
 
-      <Link to={route} className="bg-[#fff] py-2 px-3 text-primary rounded">
+      <Link to={route} className="bg-[#fff] md:hidden py-2 px-3 text-primary rounded">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="size-6" viewBox="0 0 24 24">
           <path
             fillRule="evenodd"

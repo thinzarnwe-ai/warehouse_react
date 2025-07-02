@@ -1,5 +1,5 @@
 import React from "react";
-import Stock_List_md from "../components/Stock_List_md";
+import Stock_Balance_md from "../components/Stock_Balance_md";
 import Stock_Balance_sm from "../components/Stock_Balance_sm";
 import Search_Balance_Stock from "../components/Search_Balance_Stock";
 import { useEffect, useState } from "react";
@@ -59,7 +59,9 @@ const [stocks, setStocks] = useState([]);
   return (
     <>
       <Search_Balance_Stock filters={searchFilters} setFilters={setSearchFilters}/>
-      <Stock_List_md/>
+      <Stock_Balance_md stocks={stocks}
+        pagination={pagination}
+        onPageChange={handlePageChange}/>
       <Stock_Balance_sm  stocks={stocks}
         pagination={pagination}
         onPageChange={handlePageChange}/>

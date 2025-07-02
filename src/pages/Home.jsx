@@ -59,7 +59,9 @@ const [stocks, setStocks] = useState([]);
   return (
     <>
       <Search filters={searchFilters} setFilters={setSearchFilters}/>
-      <Stock_List_md/>
+      <Stock_List_md  stocks={stocks}
+        pagination={pagination}
+        onPageChange={handlePageChange}/>
       <Stock_List_sm  stocks={stocks}
         pagination={pagination}
         onPageChange={handlePageChange}/>

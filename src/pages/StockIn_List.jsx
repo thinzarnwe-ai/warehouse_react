@@ -61,7 +61,9 @@ export default function StockIn_List() {
   return (
     <>
       <StockSearch filters={searchFilters} setFilters={setSearchFilters} />
-      <Stock_In_List_md />
+      <Stock_In_List_md stocks={stocks}
+        pagination={pagination}
+        onPageChange={handlePageChange} />
       <Stock_In_List_sm
         stocks={stocks}
         pagination={pagination}

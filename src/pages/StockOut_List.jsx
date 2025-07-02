@@ -61,7 +61,7 @@ export default function StockOut_List() {
   return (
     <>
       <StockSearch filters={searchFilters} setFilters={setSearchFilters}/>
-      <Stock_Out_List_md/>
+      <Stock_Out_List_md stocks={stocks} pagination={pagination} onPageChange={handlePageChange}/>
       <Stock_Out_List_sm
        stocks={stocks}
         pagination={pagination}
