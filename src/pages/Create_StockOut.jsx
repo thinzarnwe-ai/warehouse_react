@@ -32,7 +32,7 @@ export default function Create_StockOut() {
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
 
-    //Scan QR / Bar Code
+    //Scan QR // Bar Code
   useEffect(() => {
   
     const scannedData = sessionStorage.getItem("scannedData");
