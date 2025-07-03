@@ -56,7 +56,7 @@ export default function Create_StockOut() {
       sessionStorage.removeItem("scannedData");
       sessionStorage.removeItem("scanTarget");
     }
-  }, [location, locationOptions]);
+  }, []);
 
   //branch selected
   useEffect(() => {
