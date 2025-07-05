@@ -39,7 +39,7 @@ export default function Stock_Balance_sm({stocks, pagination, onPageChange}) {
               </span>
 
                 <p className="text-sm font-medium text-gray-200">
-                   {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric',hour: '2-digit',minute: '2-digit'})}
+                   {new Date(stock.updated_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric',hour: '2-digit',minute: '2-digit'})}
                 </p>
               </div>
             </div>

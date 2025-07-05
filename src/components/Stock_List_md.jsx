@@ -44,7 +44,7 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
               <td className="px-6 py-5">{stock.stock_tracking.product_name}</td>
               <td className="px-6 py-5">{stock.stock_tracking.location_name}</td>
               <td className="px-6 py-5">{stock.qty}</td>
-              <td className="px-6 py-5 ">
+              <td className="px-6 py-5 w-50">
                 <span className="py-1 px-2 rounded-full text-white bg-primary">
                   {stock.status}
                 </span>
