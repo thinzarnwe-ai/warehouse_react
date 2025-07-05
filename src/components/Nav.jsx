@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useRef, useEffect } from "react";
-import { Link  ,useNavigate} from 'react-router-dom';
+import { Link  ,useNavigate ,useLocation} from 'react-router-dom';
 import { useStateContext } from '../contexts/AppContext';
 
 export default function Nav({}) {
@@ -8,6 +8,18 @@ export default function Nav({}) {
     const navigate = useNavigate();
     const [open, setOpen] = useState(false);
     const dropdownRef = useRef();
+    const location = useLocation();
+
+  const getTitleByPath = () => {
+    if (location.pathname === "/") return "Movement Transition";
+    if (location.pathname === "/stock_balance_lists") return "Stock Balance Lists";
+    if (location.pathname === "/stock_in_lists") return "Stock In Lists";
+    if (location.pathname === "/stock_out_lists") return "Stock Out Lists";
+    if (location.pathname === "/transfer_lists") return "Transfer Lists";
+    if (location.pathname === "/locations") return "Location Lists";
+    return "Warehouse System";
+  };
+
     useEffect(() => {
       function handleClickOutside(event) {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -49,7 +61,7 @@ export default function Nav({}) {
     <>
       <div className="flex justify-between p-4 mb-2 shadow-sm bg-gray-50">
         <h1 className="text-primary text-xl font-bold font-poppin">
-          Warehouse System
+            {getTitleByPath()}
         </h1>
 
         <div>

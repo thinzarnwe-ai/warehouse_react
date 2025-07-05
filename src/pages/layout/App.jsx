@@ -19,7 +19,7 @@ if(!token){
     <>
       <Toaster position="top-center" reverseOrder={false} />
       <Sidebar/>
-      <div className="sm:ml-64 md:bg-[#f1efef]">
+      <div className="sm:ml-64 md:bg-[#f1efef] min-h-screen overflow-x-hidden">
         <Nav/>
         <Outlet/>
       </div>

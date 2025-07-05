@@ -40,7 +40,8 @@ export default function Stock_List_sm({stocks, pagination, onPageChange}) {
                 <span className={`inline-block py-1 px-3 text-xs font-medium rounded-xl border 
                 ${stock.status === 'in' ? 'bg-white/10 text-[#ffda37] border-[#fad017] border-2' : 
                   stock.status === 'out' ? 'bg-white/15 text-[#d32518] border-2  border-[#b95548]' : 
-                  'bg-[#2a3d47] text-[#94edf3] border-[#94edf3]'}`}>
+                  stock.status === 'Transfer In' ? 'bg-green-600 text-white border-green-400' : 
+                   'bg-[#28bec9] text-white border-[#94edf3]'}`}>
                 {stock.status}
               </span>
 

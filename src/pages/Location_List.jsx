@@ -43,39 +43,41 @@ export default function LocationList() {
     );
   };
 
-  const fetchLocationData = async (page = 1) => {
-    try {
-      const token = localStorage.getItem("token");
-      const params = new URLSearchParams({
-        page: page.toString(),
-        ...(zone ? { zone } : {}),
-        ...(row ? { row } : {}),
-      });
+const fetchLocationData = async (page = 1) => {
+  try {
+    const token = localStorage.getItem("token");
+    const params = new URLSearchParams({
+      page: page.toString(),
+      ...(zone ? { zone } : {}),
+      ...(row ? { row } : {}),
+    });
 
-      const res = await fetch(`/api/locations?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        credentials: "include",
-      });
+    const res = await fetch(`/api/locations?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      credentials: "include",
+    });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
-      const locationArray = Object.values(json.data);
-      setLocations(locationArray);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
 
-      setPagination({
-        current_page: json.current_page ?? 1,
-        total: json.total ?? locationArray.length,
-        per_page: json.per_page ?? locationArray.length,
-      });
+    const locationArray = json.data.data ?? [];
 
-      setSelectedLocations([]);
-    } catch (err) {
-      console.error("Failed to load location data:", err);
-    }
-  };
+    setLocations(locationArray);
+    setPagination({
+      current_page: json.data.current_page ?? 1,
+      total: json.data.total ?? locationArray.length,
+      per_page: json.data.per_page ?? locationArray.length,
+    });
+
+    setSelectedLocations([]);
+  } catch (err) {
+    console.error("Failed to load location data:", err);
+  }
+};
+
 
   useEffect(() => {
     fetchLocationData();

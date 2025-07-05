@@ -14,7 +14,7 @@ export function useStockForm({
   const [selectedLocation, setSelectedLocation] = useState(null);
    const navigate = useNavigate();
 
-  // QR SCAN LOGIC
+  // QR SCAN navigate page
   const startScan = (field) => {
   sessionStorage.setItem("formDraft", JSON.stringify(form));
   navigate(`/scan/${field}`);

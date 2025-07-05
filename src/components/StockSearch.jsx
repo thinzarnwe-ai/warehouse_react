@@ -29,7 +29,7 @@ export default function StockSearch({ filters, setFilters }) {
             name="product_code"
             value={filters.product_code}
             onChange={handleChange}
-            className="py-3 rounded-lg mt-2 border-primary text-sm shadow-sm border w-full px-8 focus:outline-none"
+            className="py-3 rounded-lg mt-2 border-primary text-base shadow-sm border w-full px-8 focus:outline-none"
           />
         </div>
 
@@ -41,7 +41,7 @@ export default function StockSearch({ filters, setFilters }) {
             name="from_date"
             value={filters.from_date}
             onChange={handleChange}
-            className="py-3 rounded-lg mt-2 border-primary text-sm shadow-sm border w-full px-8 focus:outline-none"
+            className="py-3 rounded-lg mt-2 border-primary text-base shadow-sm border w-full px-8 focus:outline-none"
           />
         </div>
 
@@ -53,7 +53,7 @@ export default function StockSearch({ filters, setFilters }) {
             name="to_date"
             value={filters.to_date}
             onChange={handleChange}
-            className="py-3 rounded-lg mt-2 border-primary text-sm shadow-sm border w-full px-8 focus:outline-none"
+            className="py-3 rounded-lg mt-2 border-primary text-base shadow-sm border w-full px-8 focus:outline-none"
           />
         </div>
       </div>

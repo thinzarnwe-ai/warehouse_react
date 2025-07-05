@@ -56,7 +56,7 @@ export default function Create_StockOut() {
       sessionStorage.removeItem("scannedData");
       sessionStorage.removeItem("scanTarget");
     }
-  }, [location, locationOptions]);
+  }, []);
 
   //branch selected
   useEffect(() => {
@@ -179,7 +179,7 @@ export default function Create_StockOut() {
 
             <div className="sm:col-span-3">
               <label className="block text-sm font-medium text-primary">
-                Product Name
+                Product Name <span className=" text-red-600">*</span>
               </label>
               <input
                 type="text"
@@ -196,15 +196,15 @@ export default function Create_StockOut() {
                 htmlFor="transfer_location"
                 className="block text-sm font-medium text-primary"
               >
-                To Location
+                To Location <span className=" text-red-600">*</span>
               </label>
               <div className="flex gap-5">
                 <input
-                  type="text"
+                  type="text" readOnly
                   name="transfer_location"
                   value={form.transfer_location}
                   onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
+                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
                 />
 
                 <button
@@ -233,7 +233,7 @@ export default function Create_StockOut() {
 
             <div className="sm:col-span-3">
               <label className="block text-sm font-medium text-primary">
-                From Location
+                From Location <span className=" text-red-600">*</span>
               </label>
               <Select
                 options={locationOptions}
@@ -255,6 +255,13 @@ export default function Create_StockOut() {
               )}
             </div>
 
+        <div className="sm:col-span-3">
+            <label
+              htmlFor="transfer_qty"
+              className="block text-sm font-medium text-primary"
+            >
+              Total Quantity <span className=" text-red-600">*</span>
+            </label>
             <input
               type="number"
               name="qty"
@@ -262,7 +269,7 @@ export default function Create_StockOut() {
               readOnly
               className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
             />
-
+      </div>
          
 
             {/* Quantity */}
@@ -271,13 +278,17 @@ export default function Create_StockOut() {
                 htmlFor="transfer_qty"
                 className="block text-sm font-medium text-primary"
               >
-                Transfer Quantity
+                Transfer Quantity <span className=" text-red-600">*</span>
               </label>
               <input
                 type="number"
+                min="0"
                 name="transfer_qty"
                 value={form.transfer_qty}
-                onChange={handleInputChange}
+                onChange={handleInputChange}    onKeyDown={(e) => {
+                  if (e.key === "-" || e.key === "e" || e.key === "+")
+                    e.preventDefault();
+                }}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
               />
               {errors.transfer_qty && (
@@ -291,7 +302,7 @@ export default function Create_StockOut() {
                 htmlFor="remark"
                 className="block text-sm font-medium text-primary"
               >
-                Remark
+                Remark <span className=" text-red-600">*</span>
               </label>
               <textarea
                 name="remark"

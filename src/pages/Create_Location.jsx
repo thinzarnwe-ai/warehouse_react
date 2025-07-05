@@ -105,7 +105,7 @@ export default function CreateLocation() {
 
       } else {
         console.error("Server error:", result);
-        toast.error("Failed to save location");
+        toast.error(result.message);
       }
     } catch (error) {
       console.error("Request error:", error);

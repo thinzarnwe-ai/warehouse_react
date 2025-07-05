@@ -37,11 +37,16 @@ export default function Transfer_List_sm({ stocks, pagination, onPageChange }) {
               {/* Right Side */}
               <div className="text-end space-y-1 w-25 ">
                 <span
-                  className="inline-block py-1 px-3 text-xs font-medium rounded-xl bg-[#2a3d47] text-[#94edf3] border  border-[#94edf3]"
-                  style={{ textTransform: "capitalize" }}
-                >
-                  {stock.status}
-                </span>
+                className={`inline-block py-1 px-3 text-xs font-medium rounded-xl border
+                  ${stock.status === 'Transfer In'
+                    ? 'bg-green-600 text-white border-green-400'
+                    : 'bg-[#28bec9] text-white border-[#94edf3]'
+                  }`}
+                style={{ textTransform: 'capitalize' }}
+              >
+                {stock.status}
+              </span>
+
                 <p className="text-sm font-medium text-gray-200">
                   {new Date(stock.created_at).toLocaleDateString(undefined, {
                     year: "numeric",
