@@ -48,6 +48,7 @@ export default function ScanPage() {
     startScanner();
 
     return () => {
+     
       if (scannerRef.current?.getState?.() === 2) {
         scannerRef.current.stop().then(() => scannerRef.current.clear());
       }

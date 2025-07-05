@@ -57,6 +57,7 @@ export function useStockForm({
     if (!enableProductFetch) return;
     const fetchProductDetails = async () => {
       const code = form.product_code?.trim();
+      console.log(code,'p_code')
       const branch = selectedBranch?.value;
       if (!code || !branch) return;
 
@@ -71,7 +72,7 @@ export function useStockForm({
 
         const json = await res.json();
         const results = json?.data?.[0] || [];
-
+        console.log(!Array.isArray(results) || results.length === 0,'hii');
         if (!Array.isArray(results) || results.length === 0) {
           // toast.error("Product not found.");
           setForm((prev) => ({
