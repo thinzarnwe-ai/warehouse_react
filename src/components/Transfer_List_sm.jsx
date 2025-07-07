@@ -35,9 +35,9 @@ export default function Transfer_List_sm({ stocks, pagination, onPageChange }) {
               </div>
 
               {/* Right Side */}
-              <div className="text-end space-y-1 w-25 ">
+              <div className="text-end space-y-1 w-30 ">
                 <span
-                className={`inline-block py-1 px-3 text-xs font-medium rounded-xl border
+                className={`inline-block py-1 px-2 text-xs font-medium rounded-xl border
                   ${stock.status === 'Transfer In'
                     ? 'bg-green-600 text-white border-green-400'
                     : 'bg-[#28bec9] text-white border-[#94edf3]'
