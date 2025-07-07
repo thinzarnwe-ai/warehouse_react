@@ -185,17 +185,16 @@ const fetchLocationData = async (page = 1) => {
               Selected Locations
             </h2>
             <div className="grid grid-cols-2 gap-4">
-              {selectedLocations.map((location) => (
-                <div
-                  key={location.id}
-                  className="border p-4 rounded-md shadow bg-white flex justify-between items-center"
-                >
-                  <div className="font-bold text-black">
-                    {location.location_name}
-                  </div>
-                  <QRCode value={location.location_name} size={64} />
-                </div>
-              ))}
+             {selectedLocations.map((location) => (
+            <div
+              key={location.id}
+              className="border p-4 rounded-md shadow bg-white flex flex-col items-center gap-2"
+            >
+              <QRCode value={location.location_name} size={224} />
+              <div className="font-bold text-xl text-black">{location.location_name}</div>
+            </div>
+          ))}
+
             </div>
           </div>
         </div>
