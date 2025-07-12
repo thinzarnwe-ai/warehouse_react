@@ -158,7 +158,7 @@ export default function Create_StockOut() {
                 <input
                   type="text"
                   name="product_code"
-                  value={form.product_code}
+                  value={form.product_code ?? ""}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
                 />
@@ -193,7 +193,7 @@ export default function Create_StockOut() {
               <input
                 type="text"
                 name="product_name"
-                value={form.product_name}
+                value={form.product_name ?? ""}
                 onChange={handleInputChange}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 btext-base text-gray-900"
               />
@@ -281,7 +281,7 @@ export default function Create_StockOut() {
                   type="text"
                   readOnly
                   name="transfer_location"
-                  value={form.transfer_location}
+                  value={form.transfer_location ?? ""}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
                 />
@@ -322,7 +322,7 @@ export default function Create_StockOut() {
                 type="number"
                 min="0"
                 name="transfer_qty"
-                value={form.transfer_qty}
+                value={form.transfer_qty ?? ""} 
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
                   if (e.key === "-" || e.key === "e" || e.key === "+")
