@@ -7,6 +7,7 @@ import { useStockForm } from "../custom_hooks/useStockForm";
 export default function Create_StockOut() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [errors, setErrors] = useState({});
+  const [isTyping, setIsTyping] = useState(false)
   const navigate = useNavigate();
   const SUGGESTIONS = [
     { value: "Promotion", label: "Promotion" },
@@ -28,6 +29,8 @@ export default function Create_StockOut() {
     loadingBranches,
     locationOptions,
     selectedLocation,
+    nameSuggestions,
+    setNameSuggestions,
     setSelectedLocation,
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
@@ -59,8 +62,13 @@ export default function Create_StockOut() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+     if (name === "product_name") {
+      setIsTyping(true);
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+// console.log(nameSuggestions);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -192,12 +200,37 @@ export default function Create_StockOut() {
                 name="product_name"
                 value={form.product_name}
                 onChange={handleInputChange}
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base bg-gray-100 text-gray-900"
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
               />
               {errors.product_name && (
                 <p className="text-red-500">{errors.product_name[0]}</p>
               )}
             </div>
+
+            
+            {isTyping && nameSuggestions.length > 0 && (
+              <div className="sm:col-span-3 relative">
+                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
+                  {nameSuggestions.map((item) => (
+                    <li
+                      key={item.product_code}
+                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setIsTyping(false);
+                        setNameSuggestions([]);
+                        setForm((prev) => ({
+                          ...prev,
+                          product_name: item.product_name,
+                          product_code: item.product_code,
+                        }));
+                      }}
+                    >
+                      {item.product_name} ({item.product_code})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             {/* Location */}
             <div className="sm:col-span-3">

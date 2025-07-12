@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import Select from "react-select";
 import { toast } from "react-hot-toast";
 import { useStockForm } from "../custom_hooks/useStockForm";
-import { useNavigate,useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function Create_StockIn() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -17,15 +19,14 @@ export default function Create_StockIn() {
     remark: "",
   });
 
-  const { branches, loadingBranches, startScan } =
-    useStockForm({
-      form,
-      setForm,
-      selectedBranch,
-      enableProductFetch: false,
-    });
+  const { branches, loadingBranches, startScan } = useStockForm({
+    form,
+    setForm,
+    selectedBranch,
+    enableProductFetch: false,
+  });
 
-    //Scan Qr or Bar code
+  //Scan Qr or Bar code
   useEffect(() => {
     const draft = sessionStorage.getItem("formDraft");
     if (draft) {
@@ -38,7 +39,8 @@ export default function Create_StockIn() {
     if (scannedData && scanTarget) {
       setForm((prev) => ({
         ...prev,
-        [scanTarget === "location" ? "location_name" : "product_code"]: scannedData,
+        [scanTarget === "location" ? "location_name" : "product_code"]:
+          scannedData,
       }));
 
       sessionStorage.removeItem("scannedData");
@@ -53,8 +55,7 @@ export default function Create_StockIn() {
     }
   }, [branches]);
 
-
-  //porduct fetch
+  //search by porduct code fetch
   useEffect(() => {
     const fetchProductName = async () => {
       const code = form.product_code?.trim();
@@ -70,9 +71,9 @@ export default function Create_StockIn() {
         });
 
         const json = await res.json();
-
+        console.log(json.data);
         const productName = json?.data?.product_name?.product_name1 || "";
-        // console.log(productName);
+        console.log(productName);
 
         setForm((prev) => ({
           ...prev,
@@ -89,11 +90,45 @@ export default function Create_StockIn() {
 
     fetchProductName();
   }, [form.product_code]);
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "product_name") {
+      setIsTyping(true);
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
+
+  //search by product name
+  useEffect(() => {
+    const name = form.product_name?.trim();
+    // console.log(name);
+    if (!name) {
+      setNameSuggestions([]);
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/product_name/${name}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
+
+        const json = await res.json();
+        // console.log(json);
+        setNameSuggestions(json?.data?.product_name || []);
+      } catch (err) {
+        setNameSuggestions([]);
+      }
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [form.product_name]);
+
+  // console.log(nameSuggestions);
 
   //form submit
   const handleSubmit = async (e) => {
@@ -174,7 +209,8 @@ export default function Create_StockIn() {
                   name="location_name"
                   value={form.location_name}
                   onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
+                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
+                  readOnly
                 />
 
                 <button
@@ -261,6 +297,30 @@ export default function Create_StockIn() {
               )}
             </div>
 
+            {isTyping && nameSuggestions.length > 0 && (
+              <div className="sm:col-span-3 relative">
+                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
+                  {nameSuggestions.map((item) => (
+                    <li
+                      key={item.product_code}
+                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setIsTyping(false);
+                        setNameSuggestions([]);
+                        setForm((prev) => ({
+                          ...prev,
+                          product_name: item.product_name1,
+                          product_code: item.product_code,
+                        }));
+                      }}
+                    >
+                      {item.product_name1} ({item.product_code})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             {/* Quantity */}
             <div className="sm:col-span-3">
               <label
@@ -303,7 +363,6 @@ export default function Create_StockIn() {
                 <p className="text-red-500">{errors.remark[0]}</p>
               )}
             </div>
-            
 
             {/* Submit Button */}
             <div className="flex items-center justify-end gap-x-6 w-full">

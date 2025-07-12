@@ -13,7 +13,7 @@ const [stocks, setStocks] = useState([]);
   });
 
   const [searchFilters, setSearchFilters] = useState({
-    product_code: '',
+    product_keyword: '',
     location_name: '',
   });
 
@@ -23,7 +23,7 @@ const [stocks, setStocks] = useState([]);
 
       const params = new URLSearchParams({
         page: page.toString(),
-        product_code: searchFilters.product_code || '',
+        product_keyword: searchFilters.product_keyword || '',
         location_name: searchFilters.location_name || '',
       });
 

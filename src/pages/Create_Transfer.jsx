@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function Create_StockOut() {
   const [errors, setErrors] = useState({});
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     location_name: "",
@@ -23,40 +24,42 @@ export default function Create_StockOut() {
     loadingBranches,
     locationOptions,
     selectedLocation,
+    nameSuggestions,
+    setNameSuggestions,
     setSelectedLocation,
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
 
-  //Scan QR / Bar Code
+  //session
   useEffect(() => {
     const draft = sessionStorage.getItem("formDraft");
-    if (draft) {
-      // setForm(JSON.parse(draft));
-      const parsedDraft = JSON.parse(draft);
+    const scannedData = sessionStorage.getItem("scannedData");
+    const scanTarget = sessionStorage.getItem("scanTarget");
+
+    let parsedDraft = draft ? JSON.parse(draft) : null;
+
+    if (parsedDraft) {
+      if (scannedData && scanTarget) {
+        parsedDraft = {
+          ...parsedDraft,
+          [scanTarget === "location" ? "transfer_location" : "product_code"]:
+            scannedData,
+        };
+        // sessionStorage.removeItem("scannedData");
+        // sessionStorage.removeItem("scanTarget");
+      }
+
       setForm(parsedDraft);
+
       const matchedOption = locationOptions.find(
         (opt) => opt.value === parsedDraft.location_name
       );
-      // console.log(draft.location_name);
+
       if (matchedOption) {
         setSelectedLocation(matchedOption);
       }
     }
-
-    const scannedData = sessionStorage.getItem("scannedData");
-    const scanTarget = sessionStorage.getItem("scanTarget");
-
-    if (scannedData && scanTarget) {
-      setForm((prev) => ({
-        ...prev,
-        [scanTarget === "location" ? "transfer_location" : "product_code"]:
-          scannedData,
-      }));
-
-      sessionStorage.removeItem("scannedData");
-      sessionStorage.removeItem("scanTarget");
-    }
-  }, []);
+  }, [locationOptions]);
 
   //branch selected
   useEffect(() => {
@@ -67,6 +70,9 @@ export default function Create_StockOut() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+    if (name === "product_name") {
+      setIsTyping(true);
+    }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -92,8 +98,11 @@ export default function Create_StockOut() {
       // console.log(result);
       if (res.ok) {
         toast.success("Transfer saved successfully ");
+        sessionStorage.removeItem("formDraft");
+        sessionStorage.removeItem("scannedData");
+        sessionStorage.removeItem("scanTarget");
         navigate("/transfer_lists");
-         sessionStorage.removeItem("formDraft");
+        sessionStorage.removeItem("formDraft");
       } else {
         if (result.errors) {
           setErrors(result.errors);
@@ -185,12 +194,81 @@ export default function Create_StockOut() {
                 type="text"
                 name="product_name"
                 value={form.product_name}
-                readOnly
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 bg-gray-100 text-base text-gray-900"
+                onChange={handleInputChange}
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 btext-base text-gray-900"
               />
             </div>
 
-               {/* Location */}
+            {isTyping && nameSuggestions.length > 0 && (
+              <div className="sm:col-span-3 relative">
+                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
+                  {nameSuggestions.map((item) => (
+                    <li
+                      key={item.product_code}
+                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setIsTyping(false);
+                        setNameSuggestions([]);
+                        setForm((prev) => ({
+                          ...prev,
+                          product_name: item.product_name,
+                          product_code: item.product_code,
+                        }));
+                      }}
+                    >
+                      {item.product_name} ({item.product_code})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            <div className="sm:col-span-3">
+              <label className="block text-sm font-medium text-primary">
+                From Location <span className=" text-red-600">*</span>
+              </label>
+              <Select
+                options={locationOptions}
+                value={selectedLocation}
+                onChange={(selected) => {
+                  setSelectedLocation(selected);
+                  const updatedForm = {
+                    ...form,
+                    location_name: selected?.value || "",
+                    qty: selected?.qty || "",
+                  };
+                  setForm(updatedForm);
+                  sessionStorage.setItem(
+                    "formDraft",
+                    JSON.stringify(updatedForm)
+                  );
+                }}
+                placeholder="Select location"
+                className="border border-primary"
+                isClearable
+              />
+              {errors.location_name && (
+                <p className="text-red-500">{errors.location_name[0]}</p>
+              )}
+            </div>
+
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="transfer_qty"
+                className="block text-sm font-medium text-primary"
+              >
+                Total Quantity <span className=" text-red-600">*</span>
+              </label>
+              <input
+                type="number"
+                name="qty"
+                value={form.qty}
+                readOnly
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
+              />
+            </div>
+
+            {/* Location */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="transfer_location"
@@ -200,7 +278,8 @@ export default function Create_StockOut() {
               </label>
               <div className="flex gap-5">
                 <input
-                  type="text" readOnly
+                  type="text"
+                  readOnly
                   name="transfer_location"
                   value={form.transfer_location}
                   onChange={handleInputChange}
@@ -231,47 +310,6 @@ export default function Create_StockOut() {
               )}
             </div>
 
-            <div className="sm:col-span-3">
-              <label className="block text-sm font-medium text-primary">
-                From Location <span className=" text-red-600">*</span>
-              </label>
-              <Select
-                options={locationOptions}
-                value={selectedLocation}
-                onChange={(selected) => {
-                  setSelectedLocation(selected);
-                  setForm((prev) => ({
-                    ...prev,
-                    location_name: selected?.value || "",
-                    qty: selected?.qty || "",
-                  }));
-                }}
-                placeholder="Select location"
-                className="border border-primary"
-                isClearable
-              />
-              {errors.location_name && (
-                <p className="text-red-500">{errors.location_name[0]}</p>
-              )}
-            </div>
-
-        <div className="sm:col-span-3">
-            <label
-              htmlFor="transfer_qty"
-              className="block text-sm font-medium text-primary"
-            >
-              Total Quantity <span className=" text-red-600">*</span>
-            </label>
-            <input
-              type="number"
-              name="qty"
-              value={form.qty}
-              readOnly
-              className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100"
-            />
-      </div>
-         
-
             {/* Quantity */}
             <div className="sm:col-span-3">
               <label
@@ -285,7 +323,8 @@ export default function Create_StockOut() {
                 min="0"
                 name="transfer_qty"
                 value={form.transfer_qty}
-                onChange={handleInputChange}    onKeyDown={(e) => {
+                onChange={handleInputChange}
+                onKeyDown={(e) => {
                   if (e.key === "-" || e.key === "e" || e.key === "+")
                     e.preventDefault();
                 }}

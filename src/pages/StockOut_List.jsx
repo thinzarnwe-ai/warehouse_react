@@ -39,7 +39,7 @@ export default function StockOut_List() {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
       setStocks(json.data.data);
-      console.log(json);
+      // console.log(json);
       setPagination({
         current_page: json.data.current_page,
         total: json.data.total,
