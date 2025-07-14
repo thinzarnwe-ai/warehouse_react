@@ -71,9 +71,9 @@ export default function Create_StockIn() {
         });
 
         const json = await res.json();
-        console.log(json.data);
+        // console.log(json.data);
         const productName = json?.data?.product_name?.product_name1 || "";
-        console.log(productName);
+        // console.log(productName);
 
         setForm((prev) => ({
           ...prev,
@@ -210,7 +210,7 @@ export default function Create_StockIn() {
                   value={form.location_name}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
-                 
+                  readOnly
                 />
 
                 <button
