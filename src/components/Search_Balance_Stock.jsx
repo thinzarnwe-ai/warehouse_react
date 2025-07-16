@@ -13,20 +13,6 @@ export default function Search({ filters, setFilters }) {
     navigate(`/scan/${field}`);
   };
 
-  useEffect(() => {
-    const scannedData = sessionStorage.getItem("scannedData");
-    const scanTarget = sessionStorage.getItem("scanTarget");
-
-    if (scannedData && scanTarget) {
-      setFilters((prev) => ({
-        ...prev,
-        [scanTarget === "location" ? "location_name" : "product_code"]:
-          scannedData,
-      }));
-      sessionStorage.removeItem("scannedData");
-      sessionStorage.removeItem("scanTarget");
-    }
-  }, []);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-10 bg-primary shadow-md p-4 md:p-6 md:me-5">

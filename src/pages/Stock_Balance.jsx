@@ -17,37 +17,38 @@ const [stocks, setStocks] = useState([]);
     location_name: '',
   });
 
-  const fetchStockData = async (page = 1) => {
-    try {
-      const token = localStorage.getItem("token");
+ const fetchStockData = async (page = 1, filters = searchFilters) => {
+  try {
+    const token = localStorage.getItem("token");
 
-      const params = new URLSearchParams({
-        page: page.toString(),
-        product_keyword: searchFilters.product_keyword || '',
-        location_name: searchFilters.location_name || '',
-      });
+    const params = new URLSearchParams({
+      page: page.toString(),
+      product_keyword: filters.product_keyword || "",
+      location_name: filters.location_name || "",
+    });
 
-      const res = await fetch(`/api/stock_active?${params.toString()}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-        credentials: "include",
-      });
+    const res = await fetch(`/api/stock_active?${params.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
+      credentials: "include",
+    });
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const json = await res.json();
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
 
-      setStocks(json.data.data);
-      setPagination({
-        current_page: json.data.current_page,
-        total: json.data.total,
-        per_page: json.data.per_page,
-      });
-    } catch (err) {
-      console.error("Failed to load stock data:", err);
-    }
-  };
+    setStocks(json.data.data);
+    setPagination({
+      current_page: json.data.current_page,
+      total: json.data.total,
+      per_page: json.data.per_page,
+    });
+  } catch (err) {
+    console.error("Failed to load stock data:", err);
+  }
+};
+
 
   useEffect(() => {
     fetchStockData();
@@ -56,6 +57,32 @@ const [stocks, setStocks] = useState([]);
   const handlePageChange = (newPage) => {
     fetchStockData(newPage);
   };
+
+  useEffect(() => {
+  const scannedData = sessionStorage.getItem("scannedData");
+  const scanTarget = sessionStorage.getItem("scanTarget");
+
+  if (scannedData && scanTarget) {
+    const key = scanTarget === "location" ? "location_name" : "product_keyword";
+
+    const newFilters = {
+      ...searchFilters,
+      [key]: scannedData,
+    };
+
+    setSearchFilters(newFilters); // update state
+    fetchStockData(1, newFilters); // immediate fetch
+
+    sessionStorage.removeItem("scannedData");
+    sessionStorage.removeItem("scanTarget");
+
+    setPagination((prev) => ({
+      ...prev,
+      current_page: 1,
+    }));
+  }
+}, []);
+
   return (
     <>
       <Search_Balance_Stock filters={searchFilters} setFilters={setSearchFilters}/>
