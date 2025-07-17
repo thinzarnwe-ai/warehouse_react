@@ -8,7 +8,8 @@ export default defineConfig({
   server: {
     proxy:{
       '/api': {
-        target: 'http://127.0.0.1:8000/',
+        target: 'https://miniwms.sdpghc.net/',
+        // target: 'http://103.203.133.106',
         changeOrigin: true,
         headers:{
           Accept: 'application/json',
