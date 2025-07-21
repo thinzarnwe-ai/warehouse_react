@@ -15,6 +15,7 @@ import ProfilePage from "../pages/ProfilePage.jsx";
 import Create_Location from "../pages/Create_Location.jsx";
 import Stock_Balance from "../pages/Stock_Balance.jsx";
 import ScanPage from "../pages/ScanPage.jsx";
+import Detail from "../pages/Detail.jsx";
 
   const router = createBrowserRouter([
     {
@@ -68,6 +69,11 @@ import ScanPage from "../pages/ScanPage.jsx";
           {
             path: "/scan/:target",
             element: <ScanPage/>
+          }
+          ,
+          {
+            path: "/detail/:id",
+            element : <Detail/>
           }
       ]
 
