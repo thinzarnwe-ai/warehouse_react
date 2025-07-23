@@ -1,14 +1,14 @@
 import React from 'react'
 import { useState, useRef, useEffect } from "react";
-import { Link  ,useNavigate ,useLocation} from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useStateContext } from '../contexts/AppContext';
 
-export default function Nav({}) {
-    const { user, token, setUser, setToken } =  useStateContext();
-    const navigate = useNavigate();
-    const [open, setOpen] = useState(false);
-    const dropdownRef = useRef();
-    const location = useLocation();
+export default function Nav({ }) {
+  const { user, token, setUser, setToken } = useStateContext();
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef();
+  const location = useLocation();
 
   const getTitleByPath = () => {
     if (location.pathname === "/") return "Movement Transition";
@@ -20,48 +20,57 @@ export default function Nav({}) {
     return "Warehouse System";
   };
 
-    useEffect(() => {
-      function handleClickOutside(event) {
-        if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-          setOpen(false);
-        }
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setOpen(false);
       }
-      document.addEventListener("mousedown", handleClickOutside);
-      return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
 
-    async function handleLogout(e) {
+  async function handleLogout(e) {
     e.preventDefault();
-      // console.log(e);
-     try {
-    const res = await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    console.log("Logout initiated");
 
-    const data = await res.json();
-    // console.log(data);
+    try {
+      const token = localStorage.getItem("token");
 
-    if (res.ok) {
+      if (token) {
+        const res = await fetch("/api/logout", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await res.json();
+        console.log("Logout API response:", data);
+      } else {
+        console.log("No token found, skipping API logout");
+      }
+
+
       setUser(null);
       setToken(null);
       localStorage.removeItem("token");
       navigate("/");
+
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setOpen(false);
     }
-  } catch (error) {
-    console.error("Logout failed", error);
-  } finally {
-    setOpen(false);
   }
-}
+
+
   return (
     <>
       <div className="flex justify-between p-4 mb-2 shadow-sm bg-gray-50">
         <h1 className="text-primary text-xl font-bold font-poppin">
-            {getTitleByPath()}
+          {getTitleByPath()}
         </h1>
 
         <div>
@@ -95,7 +104,7 @@ export default function Nav({}) {
                     <Link to="/profile"
                       className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       onClick={() => {
-                        console.log("View Profile");
+                        // console.log("View Profile");
                         setOpen(false);
                       }}
                     >
@@ -103,15 +112,15 @@ export default function Nav({}) {
                     </Link>
                   </li>
                   <li>
-                    <form onSubmit={handleLogout}>
-                       <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100" type="submit"
+                    <button
+                      onClick={handleLogout}
+                      type="button"
+                      className="w-full text-left px-4 py-2 hover:bg-gray-100"
                     >
                       Log Out
                     </button>
-                    </form>
-                   
                   </li>
+
                 </ul>
               </div>
             )}

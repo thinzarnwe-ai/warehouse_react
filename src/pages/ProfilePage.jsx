@@ -13,6 +13,9 @@ export default function ProfilePage() {
 
   const userInfo = user?.user || defaultUser;
   const roles = user?.roles || defaultUser.roles;
+  if(!user){
+    window.location.href = "/login";
+  }
 
   return (
     <div className="flex justify-center min-h-screen bg-gray-100">
