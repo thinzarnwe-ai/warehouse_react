@@ -30,36 +30,58 @@ export default function Create_StockOut() {
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
 
-  //session
-  useEffect(() => {
-    const draft = sessionStorage.getItem("formDraft");
-    const scannedData = sessionStorage.getItem("scannedData");
-    const scanTarget = sessionStorage.getItem("scanTarget");
 
-    let parsedDraft = draft ? JSON.parse(draft) : null;
+//scan data 
+useEffect(() => {
+  const scannedData = sessionStorage.getItem("scannedData");
+  const scanTarget = sessionStorage.getItem("scanTarget");
+  const savedDraft = sessionStorage.getItem("formDraft");
 
-    if (parsedDraft) {
-      if (scannedData && scanTarget) {
-        parsedDraft = {
-          ...parsedDraft,
-          [scanTarget === "location" ? "transfer_location" : "product_code"]:
-            scannedData,
-        };
-        // sessionStorage.removeItem("scannedData");
-        // sessionStorage.removeItem("scanTarget");
-      }
+  if (scannedData && scanTarget) {
+    let updatedForm = form;
 
-      setForm(parsedDraft);
-
-      const matchedOption = locationOptions.find(
-        (opt) => opt.value === parsedDraft.location_name
-      );
-
-      if (matchedOption) {
-        setSelectedLocation(matchedOption);
+    if (savedDraft) {
+      try {
+        updatedForm = JSON.parse(savedDraft);
+      } catch (e) {
+        console.error("Failed to parse saved draft:", e);
       }
     }
-  }, [locationOptions]);
+
+    if (scanTarget === "location") {
+      const matchedOption = locationOptions.find(
+        (opt) => opt.value === scannedData
+      );
+      // console.log(matchedOption);
+      if (matchedOption) {
+        setSelectedLocation(matchedOption);
+        updatedForm = {
+          ...updatedForm,
+          location_name: matchedOption.value,
+          qty: matchedOption.qty ?? "",
+        };
+      }
+    } else if (scanTarget === "transfer_location") {
+      updatedForm = {
+        ...updatedForm,
+        transfer_location: scannedData,
+      };
+    } else if (scanTarget === "product" || scanTarget === "product_code") {
+      updatedForm = {
+        ...updatedForm,
+        product_code: scannedData,
+      };
+    }
+
+    setForm(updatedForm);
+    sessionStorage.setItem("formDraft", JSON.stringify(updatedForm));
+    sessionStorage.removeItem("scannedData");
+    sessionStorage.removeItem("scanTarget");
+  }
+}, [locationOptions]);
+
+
+
 
   //branch selected
   useEffect(() => {
@@ -156,11 +178,11 @@ export default function Create_StockOut() {
               </label>
               <div className="flex gap-5">
                 <input
-                  type="text"
+                  type="text" readOnly
                   name="product_code"
                   value={form.product_code ?? ""}
                   onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
+                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
                 />
                 <button
                   type="button"
@@ -187,16 +209,22 @@ export default function Create_StockOut() {
             </div>
 
             <div className="sm:col-span-3">
-              <label className="block text-sm font-medium text-primary">
+              <label 
+              htmlFor="product_name"
+              className="block text-sm font-medium text-primary">
                 Product Name <span className=" text-red-600">*</span>
               </label>
               <input
                 type="text"
                 name="product_name"
-                value={form.product_name ?? ""}
+                value={form.product_name}
                 onChange={handleInputChange}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 btext-base text-gray-900"
               />
+
+                {errors.product_name && (
+                <p className="text-red-500">{errors.product_name[0]}</p>
+              )}
             </div>
 
             {isTyping && nameSuggestions.length > 0 && (
@@ -289,7 +317,7 @@ export default function Create_StockOut() {
                 <button
                   className="border-2 px-1 rounded border-primary"
                   type="button"
-                  onClick={() => startScan("location")}
+                  onClick={() => startScan("transfer_location")}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"

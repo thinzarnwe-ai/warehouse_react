@@ -16,6 +16,7 @@ import Create_Location from "../pages/Create_Location.jsx";
 import Stock_Balance from "../pages/Stock_Balance.jsx";
 import ScanPage from "../pages/ScanPage.jsx";
 import Detail from "../pages/Detail.jsx";
+import Stock_Detail from "../pages/Stock_Detail.jsx";
 
   const router = createBrowserRouter([
     {
@@ -74,6 +75,10 @@ import Detail from "../pages/Detail.jsx";
           {
             path: "/detail/:id",
             element : <Detail/>
+          },
+          {
+            path: "/stock_detail/:id",
+            element : <Stock_Detail/>
           }
       ]
 

@@ -54,7 +54,7 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
                 </span>
               </td>
              <td className="ps-10">
-              <Link to={`/detail/${stock.stock_tracking.id}`}>
+              <Link to={`/detail/${stock.id}`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"

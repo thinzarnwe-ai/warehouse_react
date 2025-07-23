@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function Detail_md({ stock }) {
+export default function Stock_Detail_md({ stock }) {
   if (!stock) return <div>Loading...</div>;
 
   return (
@@ -16,7 +16,7 @@ export default function Detail_md({ stock }) {
                 Product Code
               </td>
               <td className="py-3 px-4 text-gray-800">
-                {stock[0].stock_tracking.product_code}
+                {stock[0].product_code}
               </td>
             </tr>
             <tr>
@@ -24,29 +24,22 @@ export default function Detail_md({ stock }) {
                 Location Name
               </td>
               <td className="py-3 px-4 text-gray-800">
-                {stock[0].stock_tracking.location_name}
+                {stock[0].location_name}
               </td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-medium text-gray-600">Quantity</td>
-              <td className="py-3 px-4 text-gray-800">{stock[0].qty}</td>
+              <td className="py-3 px-4 text-gray-800">{stock[0].total_qty}</td>
             </tr>
             <tr>
               <td className="py-3 px-4 font-medium text-gray-600">Status</td>
               <td className="py-3 px-4">
                 <span className="inline-block px-3 py-1 rounded-full bg-primary text-white text-sm">
-                  {stock[0].status}
+                 Active
                 </span>
               </td>
             </tr>
-            <tr>
-              <td className="py-3 px-4 font-medium text-gray-600">User</td>
-              <td className="py-3 px-4 text-gray-800">{stock[0].user.name}</td>
-            </tr>
-            <tr>
-              <td className="py-3 px-4 font-medium text-gray-600">Remark</td>
-              <td className="py-3 px-4 text-gray-800">{stock[0].remark}</td>
-            </tr>
+           
           </tbody>
         </table>
       </div>

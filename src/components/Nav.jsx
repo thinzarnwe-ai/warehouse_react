@@ -31,32 +31,41 @@ export default function Nav({}) {
     }, []);
 
 
-    async function handleLogout(e) {
-    e.preventDefault();
-      // console.log(e);
-     try {
-    const res = await fetch("/api/logout", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+async function handleLogout(e) {
+  e.preventDefault();
+  console.log("Logout initiated");
 
-    const data = await res.json();
-    // console.log(data);
+  try {
+    const token = localStorage.getItem("token");
 
-    if (res.ok) {
-      setUser(null);
-      setToken(null);
-      localStorage.removeItem("token");
-      navigate("/");
+    if (token) {
+      const res = await fetch("/api/logout", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      console.log("Logout API response:", data);
+    } else {
+      console.log("No token found, skipping API logout");
     }
+
+    // Clear user-related data anyway
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem("token");
+    navigate("/");
+
   } catch (error) {
-    console.error("Logout failed", error);
+    console.error("Logout error:", error);
   } finally {
-    setOpen(false);
+    setOpen(false); // if closing a mobile menu or modal
   }
 }
+
+
   return (
     <>
       <div className="flex justify-between p-4 mb-2 shadow-sm bg-gray-50">
@@ -95,23 +104,23 @@ export default function Nav({}) {
                     <Link to="/profile"
                       className="w-full text-left px-4 py-2 hover:bg-gray-100"
                       onClick={() => {
-                        console.log("View Profile");
+                        // console.log("View Profile");
                         setOpen(false);
                       }}
                     >
                       View Profile
                     </Link>
                   </li>
-                  <li>
-                    <form onSubmit={handleLogout}>
-                       <button
-                      className="w-full text-left px-4 py-2 hover:bg-gray-100" type="submit"
-                    >
-                      Log Out
-                    </button>
-                    </form>
-                   
-                  </li>
+                 <li>
+                  <button
+                    onClick={handleLogout}
+                    type="button"
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                  >
+                    Log Out
+                  </button>
+                </li>
+
                 </ul>
               </div>
             )}

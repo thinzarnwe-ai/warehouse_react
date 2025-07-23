@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Detail_md from "../components/Detail_md";
+import Stock_Detail_md from "../components/Stock_Detail_md";
 
-export default function Detail() {
+export default function Stock_Detail() {
   const { id } = useParams();
 const [stock, setStock] = useState(null);
 
@@ -10,7 +10,7 @@ const [stock, setStock] = useState(null);
   try {
     const token = localStorage.getItem("token");
 
-    const res = await fetch(`/api/detail/${id}`, {
+    const res = await fetch(`/api/stock_detail/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
         Accept: "application/json",
@@ -32,6 +32,6 @@ const [stock, setStock] = useState(null);
   }, [id]);
 
   return (
-    <Detail_md stock={stock} />
+    <Stock_Detail_md stock={stock} />
   );
 }
