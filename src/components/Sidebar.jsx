@@ -16,17 +16,19 @@ export default function Sidebar() {
     }
   }, []);
 
-  useEffect(() => {
-    // Automatically update active tab from route
-    const path = location.pathname;
-    if (path.includes("stock_in_lists")) setActiveItem("stock-in");
-    else if (path.includes("stock_out_lists")) setActiveItem("stock-out");
-    else if (path.includes("transfer_lists")) setActiveItem("transfer");
-    else if (path.includes("locations")) setActiveItem("location");
-    else if (path.includes("stock_balance_lists")) setActiveItem("stock-balance");
-    else setActiveItem("home");
-  }, [location.pathname]);
+useEffect(() => {
+  const path = location.pathname;
+  const type = location.state?.type;
 
+  if (type) {
+    setActiveItem(type); 
+  } else if (path.includes("stock_in_lists")) setActiveItem("stock-in");
+  else if (path.includes("stock_out_lists")) setActiveItem("stock-out");
+  else if (path.includes("transfer_lists")) setActiveItem("transfer");
+  else if (path.includes("locations")) setActiveItem("location");
+  else if (path.includes("stock_balance_lists")) setActiveItem("stock-balance");
+  else setActiveItem("home");
+}, [location.pathname, location.state]);
   const handleOpenSidebar = () => {
     if (drawerInstanceRef.current) {
       drawerInstanceRef.current.show();

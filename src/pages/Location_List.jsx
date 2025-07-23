@@ -7,6 +7,7 @@ export default function LocationList() {
   const componentRef = useRef(null);
   const [zone, setZone] = useState("");
   const [row, setRow] = useState("");
+   const [bay, setBay] = useState("");
   const [locations, setLocations] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [pagination, setPagination] = useState({
@@ -50,6 +51,7 @@ const fetchLocationData = async (page = 1) => {
       page: page.toString(),
       ...(zone ? { zone } : {}),
       ...(row ? { row } : {}),
+      ...(bay ? { bay } : {}),
     });
 
     const res = await fetch(`/api/locations?${params.toString()}`, {
@@ -81,7 +83,7 @@ const fetchLocationData = async (page = 1) => {
 
   useEffect(() => {
     fetchLocationData();
-  }, [zone, row]);
+  }, [zone, row,bay]);
 
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);
@@ -108,6 +110,16 @@ const fetchLocationData = async (page = 1) => {
               onChange={(e) => setRow(e.target.value)}
               className="py-2 rounded-lg mt-2 border border-primary text-sm shadow-sm w-full px-4"
               placeholder="Enter Row"
+            />
+          </div>
+            <div className="w-full">
+            <label className="font-medium block">Bay</label>
+            <input
+              type="text"
+              value={bay}
+              onChange={(e) => setBay(e.target.value)}
+              className="py-2 rounded-lg mt-2 border border-primary text-sm shadow-sm w-full px-4"
+              placeholder="Enter Bay"
             />
           </div>
           <div className="w-full flex items-end">
@@ -142,25 +154,26 @@ const fetchLocationData = async (page = 1) => {
 
       <div className="p-4 space-y-6">
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {locations.map((location) => (
             <div
               key={location.id}
               className="border p-4 rounded-xl shadow bg-white flex justify-between items-center"
             >
-              <div className="space-y-2">
-                <p className="font-bold">{location.location_name}</p>
-                <label className="flex items-center gap-2 text-sm text-gray-700">
+              <div className="space-x-2 flex">
+                 <label className="flex items-center gap-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
                     className="accent-[#107a8b] w-4 h-4"
                     checked={isSelected(location.id)}
                     onChange={() => handleSelect(location)}
                   />
-                  Select
+                  {/* Select */}
                 </label>
+                <p className="font-bold">{location.location_name}</p>
+               
               </div>
-              <QRCode value={location.location_name} size={64} />
+              {/* <QRCode value={location.location_name} size={64} /> */}
             </div>
           ))}
         </div>

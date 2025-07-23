@@ -54,16 +54,15 @@ export function useStockForm({
   }, []);
   
 
-  // FETCH PRODUCT DETAILS
- useEffect(() => {
+// FETCH PRODUCT DETAILS TO GET LOCATION 
+useEffect(() => {
   if (!enableProductFetch) return;
 
   const code = form.product_code?.trim();
   const branch = selectedBranch?.value;
-
   if (!code || !branch) return;
 
-  const debounceTimeout = setTimeout(async () => {
+  const debounceTimeout = setTimeout(() => {
     const fetchProductDetails = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -76,9 +75,9 @@ export function useStockForm({
 
         const json = await res.json();
         const results = json?.data || [];
-        console.log(results);
+
         if (!Array.isArray(results) || results.length === 0) {
-          toast.error("Product code ရှာမတွေ့ပါ");
+          toast.error("Product code ရှာမတွေ့ပါ  Stock In တွင် စာရင်းသွင်းရန်လိုအပ်ပါသည် ။ ");
           setForm((prev) => ({
             ...prev,
             product_name: "",
@@ -86,6 +85,7 @@ export function useStockForm({
             qty: "",
           }));
           setLocationOptions([]);
+          setSelectedLocation(null);
           return;
         }
 
@@ -96,14 +96,28 @@ export function useStockForm({
           qty: item.total_qty,
         }));
 
-        setForm((prev) => ({
-          ...prev,
-          product_name: productName,
-          location_name: "",
-          qty: "",
-        }));
         setLocationOptions(locations);
-        setSelectedLocation(null);
+
+        setForm((prev) => {
+          const updated = {
+            ...prev,
+            product_name: productName,
+            location_name: prev.location_name,
+            qty: prev.qty,
+          };
+
+          const matchedLocation = locations.find(
+            (opt) => opt.value === updated.location_name
+          );
+
+          if (matchedLocation) {
+            setSelectedLocation(matchedLocation);
+          } else {
+            setSelectedLocation(null);
+          }
+
+          return updated;
+        });
       } catch (err) {
         console.error("Fetch product error:", err);
         toast.error("Failed to fetch product data.");
@@ -111,10 +125,11 @@ export function useStockForm({
     };
 
     fetchProductDetails();
-  }, 500); 
+  }, 500);
 
-  return () => clearTimeout(debounceTimeout); 
+  return () => clearTimeout(debounceTimeout);
 }, [enableProductFetch, form.product_code, selectedBranch]);
+
 
 // search by product name
 useEffect(() => {
