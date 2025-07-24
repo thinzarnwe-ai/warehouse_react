@@ -7,7 +7,7 @@ export default function LocationList() {
   const componentRef = useRef(null);
   const [zone, setZone] = useState("");
   const [row, setRow] = useState("");
-   const [bay, setBay] = useState("");
+  const [bay, setBay] = useState("");
   const [locations, setLocations] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
   const [pagination, setPagination] = useState({
@@ -44,46 +44,45 @@ export default function LocationList() {
     );
   };
 
-const fetchLocationData = async (page = 1) => {
-  try {
-    const token = localStorage.getItem("token");
-    const params = new URLSearchParams({
-      page: page.toString(),
-      ...(zone ? { zone } : {}),
-      ...(row ? { row } : {}),
-      ...(bay ? { bay } : {}),
-    });
+  const fetchLocationData = async (page = 1) => {
+    try {
+      const token = localStorage.getItem("token");
+      const params = new URLSearchParams({
+        page: page.toString(),
+        ...(zone ? { zone } : {}),
+        ...(row ? { row } : {}),
+        ...(bay ? { bay } : {}),
+      });
 
-    const res = await fetch(`/api/locations?${params.toString()}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        Accept: "application/json",
-      },
-      credentials: "include",
-    });
+      const res = await fetch(`/api/locations?${params.toString()}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+        credentials: "include",
+      });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
 
-    const locationArray = json.data.data ?? [];
+      const locationArray = json.data.data ?? [];
 
-    setLocations(locationArray);
-    setPagination({
-      current_page: json.data.current_page ?? 1,
-      total: json.data.total ?? locationArray.length,
-      per_page: json.data.per_page ?? locationArray.length,
-    });
+      setLocations(locationArray);
+      setPagination({
+        current_page: json.data.current_page ?? 1,
+        total: json.data.total ?? locationArray.length,
+        per_page: json.data.per_page ?? locationArray.length,
+      });
 
-    setSelectedLocations([]);
-  } catch (err) {
-    console.error("Failed to load location data:", err);
-  }
-};
-
+      setSelectedLocations([]);
+    } catch (err) {
+      console.error("Failed to load location data:", err);
+    }
+  };
 
   useEffect(() => {
     fetchLocationData();
-  }, [zone, row,bay]);
+  }, [zone, row, bay]);
 
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);
@@ -112,7 +111,7 @@ const fetchLocationData = async (page = 1) => {
               placeholder="Enter Row"
             />
           </div>
-            <div className="w-full">
+          <div className="w-full">
             <label className="font-medium block">Bay</label>
             <input
               type="text"
@@ -158,22 +157,40 @@ const fetchLocationData = async (page = 1) => {
           {locations.map((location) => (
             <div
               key={location.id}
-              className="border p-4 rounded-xl shadow bg-white flex justify-between items-center"
+              className="border p-4 rounded-xl shadow bg-white"
             >
-              <div className="space-x-2 flex">
-                 <label className="flex items-center gap-2 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    className="accent-[#107a8b] w-4 h-4"
-                    checked={isSelected(location.id)}
-                    onChange={() => handleSelect(location)}
-                  />
-                  {/* Select */}
-                </label>
-                <p className="font-bold">{location.location_name}</p>
-               
+              {/* ✅ Mobile view layout */}
+              <div className="flex justify-between items-center sm:hidden">
+                <div className="space-y-2">
+                  <p className="font-bold">{location.location_name}</p>
+                  <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      className="accent-[#107a8b] w-4 h-4"
+                      checked={isSelected(location.id)}
+                      onChange={() => handleSelect(location)}
+                    />
+                    Select
+                  </label>
+                </div>
+                <QRCode value={location.location_name} size={64} />
               </div>
-              {/* <QRCode value={location.location_name} size={64} /> */}
+
+              {/* ✅ Tablet and up layout */}
+              <div className="hidden sm:flex justify-between items-center">
+                <div className="space-x-2 flex items-center">
+                  <label className="flex items-center gap-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      className="accent-[#107a8b] w-4 h-4"
+                      checked={isSelected(location.id)}
+                      onChange={() => handleSelect(location)}
+                    />
+                  </label>
+                  <p className="font-bold">{location.location_name}</p>
+                </div>
+                {/* QRCode hidden in non-mobile as per your example */}
+              </div>
             </div>
           ))}
         </div>
@@ -198,16 +215,17 @@ const fetchLocationData = async (page = 1) => {
               Selected Locations
             </h2>
             <div className="grid grid-cols-2 gap-4">
-             {selectedLocations.map((location) => (
-            <div
-              key={location.id}
-              className="border p-4 rounded-md shadow bg-white flex flex-col items-center gap-2"
-            >
-              <QRCode value={location.location_name} size={224} />
-              <div className="font-bold text-xl text-black">{location.location_name}</div>
-            </div>
-          ))}
-
+              {selectedLocations.map((location) => (
+                <div
+                  key={location.id}
+                  className="border p-4 rounded-md shadow bg-white flex flex-col items-center gap-2"
+                >
+                  <QRCode value={location.location_name} size={224} />
+                  <div className="font-bold text-xl text-black">
+                    {location.location_name}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
