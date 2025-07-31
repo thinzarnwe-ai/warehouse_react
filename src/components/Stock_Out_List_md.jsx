@@ -104,7 +104,7 @@ export default function Stock_Out_List_md({
                     </span>
                   </td>
 
-                  <td className="ps-7 flex items-center gap-1 py-6">
+                  <td className="ps-7 flex gap-1 pt-[30px]">
                     <Link to={`/detail/${stock.id}`} state={{ type: "stock-out" }} >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"

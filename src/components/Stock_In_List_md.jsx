@@ -95,14 +95,14 @@ export default function Stock_In_List_md({
                   <td className="px-6 py-5">
                     {stock.stock_tracking.location_name}
                   </td>
-                  <td className="px-6 py-5">{stock.qty}</td>
-                   <td className="px-6 text-sm w-35">  {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric'})}</td>
+                  <td className="px-6 py-5 h-full">{stock.qty}</td>
+                   <td className='' >  {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric'})}</td>
                   <td className="px-6 py-5 ">
                     <span className="py-1 px-2 rounded-md text-sm text-white bg-primary">
                       {stock.status}
                     </span>
                   </td>
-                  <td className="ps-7 flex items-center gap-1 py-6">
+                  <td className="ps-7 flex gap-1 pt-[30px]">
                     <Link
                       to={`/detail/${stock.id}`}
                       state={{ type: "stock-in" }}
