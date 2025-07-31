@@ -157,11 +157,15 @@ export default function Create_StockOut() {
               </label>
               <div className="flex gap-5">
                 <input
+<<<<<<< HEAD
                   type="text"
+=======
+                  type="text" 
+>>>>>>> 5540f91 (udpate)
                   name="product_code"
                   value={form.product_code}
                   onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base bg-gray-200 text-gray-900"
+                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base  text-gray-900"
                 />
                 <button
                   type="button"
