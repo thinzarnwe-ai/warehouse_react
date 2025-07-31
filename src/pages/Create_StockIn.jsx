@@ -1,381 +1,144 @@
-import React, { useEffect, useState } from "react";
-import Select from "react-select";
-import { toast } from "react-hot-toast";
-import { useStockForm } from "../custom_hooks/useStockForm";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function Create_StockIn() {
-  const [selectedBranch, setSelectedBranch] = useState(null);
-  const [errors, setErrors] = useState({});
+const BARCODE_FORMATS = [
+  "qr_code",
+  "ean_13",
+  "ean_8",
+  "code_128",
+  "code_39",
+  "upc_a",
+  "upc_e",
+];
+
+export default function ScanPage() {
+  const { target } = useParams();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [nameSuggestions, setNameSuggestions] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
-  const [form, setForm] = useState({
-    location_name: "",
-    product_code: "",
-    product_name: "",
-    qty: "",
-    remark: "",
-  });
+  const [error, setError] = useState("");
+  const [scanned, setScanned] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const videoRef = useRef(null);
 
-  const { branches, loadingBranches, startScan } = useStockForm({
-    form,
-    setForm,
-    selectedBranch,
-    enableProductFetch: false,
-  });
-
-  //Scan Qr or Bar code
   useEffect(() => {
-    const draft = sessionStorage.getItem("formDraft");
-    if (draft) {
-      setForm(JSON.parse(draft));
-    }
+    let stream = null;
+    let detectionInterval = null;
+    let hintTimeout = null;
 
-    const scannedData = sessionStorage.getItem("scannedData");
-    const scanTarget = sessionStorage.getItem("scanTarget");
-
-    if (scannedData && scanTarget) {
-      setForm((prev) => ({
-        ...prev,
-        [scanTarget === "location" ? "location_name" : "product_code"]:
-          scannedData,
-      }));
-
-      sessionStorage.removeItem("scannedData");
-      sessionStorage.removeItem("scanTarget");
-    }
-  }, [location]);
-
-  //Branch Selected
-  useEffect(() => {
-    if (branches.length > 0 && !selectedBranch) {
-      setSelectedBranch(branches[0]);
-    }
-  }, [branches]);
-
-  //search by porduct code fetch
-  useEffect(() => {
-    const fetchProductName = async () => {
-      const code = form.product_code?.trim();
-      if (!code) return;
+    const startScanner = async () => {
+      if (!("BarcodeDetector" in window)) {
+        setError("Barcode Detection API is not supported in this browser.");
+        return;
+      }
 
       try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/product/${code}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: "environment" },
+            width: { ideal: 1920 },
+            height: { ideal: 1080 },
           },
         });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+          await videoRef.current.play();
+        }
 
-        const json = await res.json();
-        // console.log(json.data);
-        const productName = json?.data?.product_name?.product_name1 || "";
-        // console.log(productName);
+        // Show hint if not scanned in 3 seconds
+        hintTimeout = setTimeout(() => setShowHint(true), 3000);
 
-        setForm((prev) => ({
-          ...prev,
-          product_name: productName,
-        }));
-      } catch (err) {
-        // console.warn("Failed to fetch product name:", err);
-        setForm((prev) => ({
-          ...prev,
-          product_name: "",
-        }));
+        const barcodeDetector = new window.BarcodeDetector({
+          formats: BARCODE_FORMATS,
+        });
+
+        detectionInterval = setInterval(async () => {
+          if (!videoRef.current || scanned) return;
+          try {
+            const video = videoRef.current;
+            // Crop the middle 1/3 of the frame (good for 1D barcodes)
+            const cropY = video.videoHeight / 3;
+            const cropHeight = video.videoHeight / 3;
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth;
+            canvas.height = cropHeight;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(
+              video,
+              0, cropY, video.videoWidth, cropHeight, // src: x, y, w, h
+              0, 0, video.videoWidth, cropHeight      // dest: x, y, w, h
+            );
+
+            const barcodes = await barcodeDetector.detect(canvas);
+            if (barcodes.length > 0) {
+              const scannedText = barcodes[0].rawValue;
+              if (scannedText.startsWith(']C')) {
+                scannedText = scannedText.slice(3);
+              }
+              setScanned(true);
+              setShowHint(false);
+              sessionStorage.setItem("scannedData", scannedText);
+              sessionStorage.setItem("scanTarget", target ?? "");
+              navigate(-1); // Go back
+            }
+          } catch (e) {
+            // Ignore detection errors per frame
+          }
+        }, 200);
+      } catch (e) {
+        setError("Camera access error: " + e.message);
       }
     };
 
-    fetchProductName();
-  }, [form.product_code]);
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "product_name") {
-      setIsTyping(true);
-    }
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
+    startScanner();
 
-  //search by product name
-  useEffect(() => {
-    const name = form.product_name?.trim();
-    // console.log(name);
-    if (!name) {
-      setNameSuggestions([]);
-      return;
-    }
-
-    const delayDebounce = setTimeout(async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/product_name/${name}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
-
-        const json = await res.json();
-        // console.log(json);
-        setNameSuggestions(json?.data?.product_name || []);
-      } catch (err) {
-        setNameSuggestions([]);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounce);
-  }, [form.product_name]);
-
-  // console.log(nameSuggestions);
-
-  //form submit
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    const token = localStorage.getItem("token");
-    try {
-      const res = await fetch("/api/stock_tracking_in", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          from_branch: selectedBranch?.value,
-        }),
-      });
-
-      const result = await res.json();
-      if (res.ok) {
-        toast.success("Stock In saved successfully.");
-        navigate("/stock_in_lists");
-        sessionStorage.removeItem("formDraft");
-      } else {
-        if (result.errors) {
-          setErrors(result.errors);
-        }
-        toast.error(result.message || "Validation failed.");
-      }
-    } catch (error) {
-      toast.error("An error occurred while saving form.");
-    }
-  };
+    return () => {
+      if (detectionInterval) clearInterval(detectionInterval);
+      if (stream) stream.getTracks().forEach((track) => track.stop());
+      if (hintTimeout) clearTimeout(hintTimeout);
+    };
+    // eslint-disable-next-line
+  }, [navigate, scanned, target]);
 
   return (
-    <form onSubmit={handleSubmit} className="md:bg-gray-200 md:p-[20px]">
-      <div className="space-y-12 pb-0 md:w-[75%] md:m-auto border-1 border-primary shadow rounded-3xl bg-primary">
-        <div className="md:h-15 h-15 flex items-end justify-center rounded">
-          <h2 className="text-2xl font-bold text-white">Stock In Form</h2>
-        </div>
-        <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
-          <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-            {/* Branch Select */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="branch"
-                className="block text-sm font-medium text-primary"
-              >
-                Branch <span className="text-red-600">*</span>
-              </label>
-              <div className="mt-2">
-                <Select
-                  id="branch"
-                  name="branch_name"
-                  options={branches}
-                  value={selectedBranch}
-                  onChange={setSelectedBranch}
-                  isLoading={loadingBranches}
-                  placeholder="Select a branch"
-                  className="text-sm w-full border border-primary"
-                  classNamePrefix="react-select"
-                />
-              </div>
-            </div>
-
-            {/* Location */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="location_name"
-                className="block text-sm font-medium text-primary"
-              >
-                Location <span className="text-red-600">*</span>
-              </label>
-              <div className="flex gap-5">
-                <input
-                  type="text"
-                  name="location_name"
-                  value={form.location_name}
-                  onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
-                  readOnly
-                />
-
-                <button
-                  type="button"
-                  className="border-2 px-1 rounded border-primary"
-                  onClick={() => startScan("location")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-8"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 4.875C3 3.839 3.84 3 4.875 3h4.5c1.036 0 1.875.84 1.875 1.875v4.5c0 1.036-.84 1.875-1.875 1.875h-4.5A1.875 1.875 0 0 1 3 9.375v-4.5ZM4.875 4.5a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5Zm7.875.375c0-1.036.84-1.875 1.875-1.875h4.5C20.16 3 21 3.84 21 4.875v4.5c0 1.036-.84 1.875-1.875 1.875h-4.5a1.875 1.875 0 0 1-1.875-1.875v-4.5Zm1.875-.375a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75A.75.75 0 0 1 6 7.5v-.75Zm9.75 0A.75.75 0 0 1 16.5 6h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM3 14.625c0-1.036.84-1.875 1.875-1.875h4.5c1.036 0 1.875.84 1.875 1.875v4.5c0 1.035-.84 1.875-1.875 1.875h-4.5A1.875 1.875 0 0 1 3 19.125v-4.5Zm1.875-.375a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5Zm7.875-.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm6 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM6 16.5a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm9.75 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm-3 3a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm6 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-              {errors.location_name && (
-                <p className="text-red-500">{errors.location_name[0]}</p>
-              )}
-            </div>
-
-            {/* Product Code */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="product_code"
-                className="block text-sm font-medium text-primary"
-              >
-                Product Code <span className="text-red-600">*</span>
-              </label>
-              <div className="flex gap-5">
-                <input
-                  type="text"
-                  name="product_code"
-                  value={form.product_code}
-                  onChange={handleInputChange}
-                  className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
-                />
-                <button
-                  className="border-2 px-1 rounded border-primary"
-                  type="button"
-                  onClick={() => startScan("product")}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="size-8"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M3 4.875C3 3.839 3.84 3 4.875 3h4.5c1.036 0 1.875.84 1.875 1.875v4.5c0 1.036-.84 1.875-1.875 1.875h-4.5A1.875 1.875 0 0 1 3 9.375v-4.5ZM4.875 4.5a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5Zm7.875.375c0-1.036.84-1.875 1.875-1.875h4.5C20.16 3 21 3.84 21 4.875v4.5c0 1.036-.84 1.875-1.875 1.875h-4.5a1.875 1.875 0 0 1-1.875-1.875v-4.5Zm1.875-.375a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5ZM6 6.75A.75.75 0 0 1 6.75 6h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75A.75.75 0 0 1 6 7.5v-.75Zm9.75 0A.75.75 0 0 1 16.5 6h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM3 14.625c0-1.036.84-1.875 1.875-1.875h4.5c1.036 0 1.875.84 1.875 1.875v4.5c0 1.035-.84 1.875-1.875 1.875h-4.5A1.875 1.875 0 0 1 3 19.125v-4.5Zm1.875-.375a.375.375 0 0 0-.375.375v4.5c0 .207.168.375.375.375h4.5a.375.375 0 0 0 .375-.375v-4.5a.375.375 0 0 0-.375-.375h-4.5Zm7.875-.75a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm6 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75ZM6 16.5a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm9.75 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm-3 3a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Zm6 0a.75.75 0 0 1 .75-.75h.75a.75.75 0 0 1 .75.75v.75a.75.75 0 0 1-.75.75h-.75a.75.75 0 0 1-.75-.75v-.75Z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </button>
-              </div>
-              {errors.product_code && (
-                <p className="text-red-500">{errors.product_code[0]}</p>
-              )}
-            </div>
-
-            {/* Product Name */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="product_name"
-                className="block text-sm font-medium text-primary"
-              >
-                Product Name <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="text"
-                name="product_name"
-                value={form.product_name}
-                onChange={handleInputChange}
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
-              />
-              {errors.product_name && (
-                <p className="text-red-500">{errors.product_name[0]}</p>
-              )}
-            </div>
-
-            {isTyping && nameSuggestions.length > 0 && (
-              <div className="sm:col-span-3 relative">
-                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
-                  {nameSuggestions.map((item) => (
-                    <li
-                      key={item.product_code}
-                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setIsTyping(false);
-                        setNameSuggestions([]);
-                        setForm((prev) => ({
-                          ...prev,
-                          product_name: item.product_name1,
-                          product_code: item.product_code,
-                        }));
-                      }}
-                    >
-                      {item.product_name1} ({item.product_code})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Quantity */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="qty"
-                className="block text-sm font-medium text-primary"
-              >
-                Add Quantity <span className="text-red-600">*</span>
-              </label>
-              <input
-                type="number"
-                name="qty"
-                min="0"
-                value={form.qty}
-                onChange={handleInputChange}
-                onKeyDown={(e) => {
-                  if (e.key === "-" || e.key === "e" || e.key === "+")
-                    e.preventDefault();
-                }}
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
-              />
-              {errors.qty && <p className="text-red-500">{errors.qty[0]}</p>}
-            </div>
-
-            {/* Remark */}
-            <div className="sm:col-span-3">
-              <label
-                htmlFor="remark"
-                className="block text-sm font-medium text-primary"
-              >
-                Reason <span className="text-red-600">*</span>
-              </label>
-              <textarea
-                name="remark"
-                value={form.remark}
-                onChange={handleInputChange}
-                rows="5"
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900"
-              />
-              {errors.remark && (
-                <p className="text-red-500">{errors.remark[0]}</p>
-              )}
-            </div>
-
-            {/* Submit Button */}
-            <div className="flex items-center justify-end gap-x-6 w-full">
-              <button
-                type="submit"
-                className="rounded-md bg-primary px-10 py-3 text-md font-semibold text-white shadow hover:bg-[#6ac9c9]"
-              >
-                Save
-              </button>
-            </div>
-          </div>
-        </div>
+    <div className="relative w-screen h-screen bg-black text-white flex flex-col">
+      <div className="flex justify-between items-center px-4 py-3 bg-blue-500 text-white">
+        <button onClick={() => navigate(-1)} className="text-md font-semibold">
+          Cancel
+        </button>
+        <h2 className="text-lg font-bold">Scan QR / Barcode</h2>
+        <div className="w-12" />
       </div>
-    </form>
+      <div className="flex-grow flex flex-col items-center justify-center">
+        <div className="w-64 h-64 overflow-hidden rounded shadow bg-black flex items-center justify-center relative">
+          {/* Show overlay for center scan area */}
+          <video
+            ref={videoRef}
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            playsInline
+            muted
+          />
+          <div
+            style={{
+              position: "absolute",
+              top: "33.3%",
+              left: 0,
+              width: "100%",
+              height: "33.4%",
+              border: "2px dashed #42c8f4",
+              borderRadius: "8px",
+              pointerEvents: "none",
+            }}
+          />
+        </div>
+        {error && <p className="mt-2 text-red-400">{error}</p>}
+        <p className="mt-4 text-gray-300">
+          ဘောင်အတွင်း ဘားကုဒ် သို့မဟုတ် QR ကုဒ်ကို ချိန်ညှိပါ။
+        </p>
+        {showHint && !scanned && (
+          <p className="mt-2 text-yellow-400 text-center">
+            အကြံပြုချက်- သင့်ဖုန်းကို သေချာစွာ ကိုင်ထားပါ၊ ဘားကုဒ်သည် ပြတ်သားပြီး အလင်းရောင်ကောင်းမွန်သော နေရာတွင်ထားပါ။
+          </p>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,140 +1,85 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-
-const BARCODE_FORMATS = [
-  "qr_code",
-  "ean_13",
-  "ean_8",
-  "code_128",
-  "code_39",
-  "upc_a",
-  "upc_e",
-];
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 export default function ScanPage() {
   const { target } = useParams();
   const navigate = useNavigate();
+  const scannerRef = useRef(null);
+  const qrRegionId = "qr-reader";
   const [error, setError] = useState("");
-  const [scanned, setScanned] = useState(false);
-  const [showHint, setShowHint] = useState(false);
-  const videoRef = useRef(null);
 
   useEffect(() => {
-    let stream = null;
-    let detectionInterval = null;
-    let hintTimeout = null;
-
     const startScanner = async () => {
-      if (!("BarcodeDetector" in window)) {
-        setError("Barcode Detection API is not supported in this browser.");
-        return;
-      }
-
       try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
+        const scanner = new Html5Qrcode(qrRegionId);
+        scannerRef.current = scanner;
+
+        const cameras = await Html5Qrcode.getCameras();
+        if (!cameras.length) throw new Error("No camera found");
+
+        await scanner.start(
+          { facingMode: "environment" },
+          {
+            fps: 10,
+            qrbox: 250,
+            formatsToSupport: [
+              Html5QrcodeSupportedFormats.QR_CODE,
+              Html5QrcodeSupportedFormats.EAN_13,
+              Html5QrcodeSupportedFormats.CODE_128,
+              Html5QrcodeSupportedFormats.UPC_A,
+              Html5QrcodeSupportedFormats.UPC_E,
+            ],
           },
-        });
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-          await videoRef.current.play();
-        }
-
-        // Show hint if not scanned in 3 seconds
-        hintTimeout = setTimeout(() => setShowHint(true), 3000);
-
-        const barcodeDetector = new window.BarcodeDetector({
-          formats: BARCODE_FORMATS,
-        });
-
-        detectionInterval = setInterval(async () => {
-          if (!videoRef.current || scanned) return;
-          try {
-            const video = videoRef.current;
-            // Crop the middle 1/3 of the frame (good for 1D barcodes)
-            const cropY = video.videoHeight / 3;
-            const cropHeight = video.videoHeight / 3;
-            const canvas = document.createElement("canvas");
-            canvas.width = video.videoWidth;
-            canvas.height = cropHeight;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(
-              video,
-              0, cropY, video.videoWidth, cropHeight, // src: x, y, w, h
-              0, 0, video.videoWidth, cropHeight      // dest: x, y, w, h
-            );
-
-            const barcodes = await barcodeDetector.detect(canvas);
-            if (barcodes.length > 0) {
-              const scannedText = barcodes[0].rawValue;
-              setScanned(true);
-              setShowHint(false);
-              sessionStorage.setItem("scannedData", scannedText);
-              sessionStorage.setItem("scanTarget", target ?? "");
-              navigate(-1); // Go back
-            }
-          } catch (e) {
-            // Ignore detection errors per frame
+          (decodedText) => {
+            sessionStorage.setItem("scannedData", decodedText);
+            sessionStorage.setItem("scanTarget", target);
+            stopAndGoBack();
+          },
+          (errorMsg) => {
+            console.warn("Scan Error:", errorMsg);
           }
-        }, 200);
-      } catch (e) {
-        setError("Camera access error: " + e.message);
+        );
+      } catch (err) {
+        setError(err.message);
       }
     };
 
     startScanner();
 
     return () => {
-      if (detectionInterval) clearInterval(detectionInterval);
-      if (stream) stream.getTracks().forEach((track) => track.stop());
-      if (hintTimeout) clearTimeout(hintTimeout);
+      if (scannerRef.current?.getState?.() === 2) {
+        scannerRef.current.stop().then(() => scannerRef.current.clear());
+      }
     };
-    // eslint-disable-next-line
-  }, [navigate, scanned, target]);
+  }, [target]);
+
+  const stopAndGoBack = async () => {
+    try {
+      if (scannerRef.current?.getState?.() === 2) {
+        await scannerRef.current.stop();
+        await scannerRef.current.clear();
+      }
+    } catch {}
+    navigate(-1);
+  };
 
   return (
     <div className="relative w-screen h-screen bg-black text-white flex flex-col">
       <div className="flex justify-between items-center px-4 py-3 bg-blue-500 text-white">
-        <button onClick={() => navigate(-1)} className="text-md font-semibold">
+        <button onClick={stopAndGoBack} className="text-md font-semibold">
           Cancel
         </button>
-        <h2 className="text-lg font-bold">Scan QR / Barcode</h2>
+        <h2 className="text-lg font-bold">Scan QR Code</h2>
         <div className="w-12" />
       </div>
+
       <div className="flex-grow flex flex-col items-center justify-center">
-        <div className="w-64 h-64 overflow-hidden rounded shadow bg-black flex items-center justify-center relative">
-          {/* Show overlay for center scan area */}
-          <video
-            ref={videoRef}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-            playsInline
-            muted
-          />
-          <div
-            style={{
-              position: "absolute",
-              top: "33.3%",
-              left: 0,
-              width: "100%",
-              height: "33.4%",
-              border: "2px dashed #42c8f4",
-              borderRadius: "8px",
-              pointerEvents: "none",
-            }}
-          />
-        </div>
-        {error && <p className="mt-2 text-red-400">{error}</p>}
+        <div id={qrRegionId} className="w-64 h-64 relative" />
+
         <p className="mt-4 text-gray-300">
-          ဘောင်အတွင်း ဘားကုဒ် သို့မဟုတ် QR ကုဒ်ကို ချိန်ညှိပါ။
+          Align QR code or barcode within frame to scan
         </p>
-        {showHint && !scanned && (
-          <p className="mt-2 text-yellow-400 text-center">
-            အကြံပြုချက်- သင့်ဖုန်းကို သေချာစွာ ကိုင်ထားပါ၊ ဘားကုဒ်သည် ပြတ်သားပြီး အလင်းရောင်ကောင်းမွန်သော နေရာတွင်ထားပါ။
-          </p>
-        )}
       </div>
     </div>
   );

@@ -2,12 +2,37 @@ import React, { useEffect, useRef, useState } from "react";
 import { Drawer } from "flowbite";
 import { Link, useLocation } from "react-router-dom";
 export default function Sidebar() {
-   const [activeItem, setActiveItem] = useState('home');
+  const [activeItem, setActiveItem] = useState("home");
   const sidebarRef = useRef(null);
   const drawerInstanceRef = useRef(null);
   const location = useLocation();
 
-   useEffect(() => {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+
+  useEffect(() => {
+    const handler = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+    };
+
+    window.addEventListener("beforeinstallprompt", handler);
+
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") {
+      console.log("User accepted the install prompt");
+    } else {
+      console.log("User dismissed the install prompt");
+    }
+    setDeferredPrompt(null);
+  };
+
+  useEffect(() => {
     const sidebarElement = document.getElementById("default-sidebar");
     if (sidebarElement && !drawerInstanceRef.current) {
       drawerInstanceRef.current = new Drawer(sidebarElement, {
@@ -16,19 +41,20 @@ export default function Sidebar() {
     }
   }, []);
 
-useEffect(() => {
-  const path = location.pathname;
-  const type = location.state?.type;
+  useEffect(() => {
+    const path = location.pathname;
+    const type = location.state?.type;
 
-  if (type) {
-    setActiveItem(type); 
-  } else if (path.includes("stock_in_lists")) setActiveItem("stock-in");
-  else if (path.includes("stock_out_lists")) setActiveItem("stock-out");
-  else if (path.includes("transfer_lists")) setActiveItem("transfer");
-  else if (path.includes("locations")) setActiveItem("location");
-  else if (path.includes("stock_balance_lists")) setActiveItem("stock-balance");
-  else setActiveItem("home");
-}, [location.pathname, location.state]);
+    if (type) {
+      setActiveItem(type);
+    } else if (path.includes("stock_in_lists")) setActiveItem("stock-in");
+    else if (path.includes("stock_out_lists")) setActiveItem("stock-out");
+    else if (path.includes("transfer_lists")) setActiveItem("transfer");
+    else if (path.includes("locations")) setActiveItem("location");
+    else if (path.includes("stock_balance_lists"))
+      setActiveItem("stock-balance");
+    else setActiveItem("home");
+  }, [location.pathname, location.state]);
   const handleOpenSidebar = () => {
     if (drawerInstanceRef.current) {
       drawerInstanceRef.current.show();
@@ -108,11 +134,17 @@ useEffect(() => {
                 />
               </svg>
             </li>
-            <li className={`rounded-xl mt-7 ${activeItem === 'home' ? 'bg-primary'  : ''}`}>
-              <Link to="/"   onClick={() => {
-                setActiveItem('home');
-                handleCloseSidebar();
-              }}
+            <li
+              className={`rounded-xl mt-7 ${
+                activeItem === "home" ? "bg-primary" : ""
+              }`}
+            >
+              <Link
+                to="/"
+                onClick={() => {
+                  setActiveItem("home");
+                  handleCloseSidebar();
+                }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group"
               >
                 <svg
@@ -121,7 +153,9 @@ useEffect(() => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className={`size-6 ${activeItem === 'home' ? 'text-white'  : 'text-primary'}`}
+                  className={`size-6 ${
+                    activeItem === "home" ? "text-white" : "text-primary"
+                  }`}
                 >
                   <path
                     strokeLinecap="round"
@@ -130,14 +164,26 @@ useEffect(() => {
                   />
                 </svg>
 
-                <span className={`ms-3 font-bold ${activeItem === 'home' ? 'text-white'  : 'text-primary'}`}>Movement Transition</span>
+                <span
+                  className={`ms-3 font-bold ${
+                    activeItem === "home" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  Movement Transition
+                </span>
               </Link>
             </li>
-             <li className={`rounded-xl ${activeItem === 'stock-balance' ? 'bg-primary'  : ''}`}>
-              <Link to="/stock_balance_lists"   onClick={() => {
-                setActiveItem('stock-balance');
-                handleCloseSidebar();
-              }}
+            <li
+              className={`rounded-xl ${
+                activeItem === "stock-balance" ? "bg-primary" : ""
+              }`}
+            >
+              <Link
+                to="/stock_balance_lists"
+                onClick={() => {
+                  setActiveItem("stock-balance");
+                  handleCloseSidebar();
+                }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group"
               >
                 {/* <svg
@@ -155,18 +201,45 @@ useEffect(() => {
                   />
                 </svg> */}
 
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className={`size-6 ${activeItem === 'stock-balance' ? 'text-white'  : 'text-primary'}`}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z" />
-              </svg>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className={`size-6 ${
+                    activeItem === "stock-balance"
+                      ? "text-white"
+                      : "text-primary"
+                  }`}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0 0 12 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 0 1-2.031.352 5.988 5.988 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971Zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0 2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 0 1-2.031.352 5.989 5.989 0 0 1-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971Z"
+                  />
+                </svg>
 
-
-                <span className={`ms-3 font-bold ${activeItem === 'stock-balance' ? 'text-white'  : 'text-primary'}`}>Stock Balance</span>
+                <span
+                  className={`ms-3 font-bold ${
+                    activeItem === "stock-balance"
+                      ? "text-white"
+                      : "text-primary"
+                  }`}
+                >
+                  Stock Balance
+                </span>
               </Link>
             </li>
-            <li className={`rounded-xl ${activeItem === 'stock-in' ? 'bg-primary' : ''}`}>
+            <li
+              className={`rounded-xl ${
+                activeItem === "stock-in" ? "bg-primary" : ""
+              }`}
+            >
               <Link
-                to="stock_in_lists"   onClick={() => {
-                  setActiveItem('stock-in');
+                to="stock_in_lists"
+                onClick={() => {
+                  setActiveItem("stock-in");
                   handleCloseSidebar();
                 }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group"
@@ -177,7 +250,9 @@ useEffect(() => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className={`size-6 ${activeItem === 'stock-in' ? 'text-white'  : 'text-primary'}`}
+                  className={`size-6 ${
+                    activeItem === "stock-in" ? "text-white" : "text-primary"
+                  }`}
                 >
                   <path
                     strokeLinecap="round"
@@ -185,13 +260,24 @@ useEffect(() => {
                     d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
                   />
                 </svg>
-                <span className={`ms-3  font-bold ${activeItem === 'stock-in' ? 'text-white'  : 'text-primary'}`}>Stock In Lists</span>
+                <span
+                  className={`ms-3  font-bold ${
+                    activeItem === "stock-in" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  Stock In Lists
+                </span>
               </Link>
             </li>
-            <li className={`rounded-xl ${activeItem === 'stock-out' ? 'bg-primary' : ''}`}>
+            <li
+              className={`rounded-xl ${
+                activeItem === "stock-out" ? "bg-primary" : ""
+              }`}
+            >
               <Link
-                to="/stock_out_lists" onClick={() => {
-                  setActiveItem('stock-out');
+                to="/stock_out_lists"
+                onClick={() => {
+                  setActiveItem("stock-out");
                   handleCloseSidebar();
                 }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white  dark:hover:bg-gray-700 group"
@@ -202,7 +288,9 @@ useEffect(() => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className={`size-6 ${activeItem === 'stock-out' ? 'text-white'  : 'text-primary'}`}
+                  className={`size-6 ${
+                    activeItem === "stock-out" ? "text-white" : "text-primary"
+                  }`}
                 >
                   <path
                     strokeLinecap="round"
@@ -211,13 +299,24 @@ useEffect(() => {
                   />
                 </svg>
 
-                <span className={`ms-3 font-bold ${activeItem === 'stock-out' ? 'text-white'  : 'text-primary'}`}>Stock Out Lists</span>
+                <span
+                  className={`ms-3 font-bold ${
+                    activeItem === "stock-out" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  Stock Out Lists
+                </span>
               </Link>
             </li>
-            <li className={`rounded-xl ${activeItem === 'transfer' ? 'bg-primary' : ''}`}>
+            <li
+              className={`rounded-xl ${
+                activeItem === "transfer" ? "bg-primary" : ""
+              }`}
+            >
               <Link
-                to="transfer_lists" onClick={() => {
-                  setActiveItem('transfer');
+                to="transfer_lists"
+                onClick={() => {
+                  setActiveItem("transfer");
                   handleCloseSidebar();
                 }}
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group"
@@ -228,7 +327,9 @@ useEffect(() => {
                   viewBox="0 0 24 24"
                   strokeWidth={1.5}
                   stroke="currentColor"
-                  className={`size-6 ${activeItem === 'transfer' ? 'text-white'  : 'text-primary'}`}
+                  className={`size-6 ${
+                    activeItem === "transfer" ? "text-white" : "text-primary"
+                  }`}
                 >
                   <path
                     strokeLinecap="round"
@@ -236,26 +337,78 @@ useEffect(() => {
                     d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z"
                   />
                 </svg>
-                <span className={`ms-3 font-bold ${activeItem === 'transfer' ? 'text-white'  : 'text-primary'}`}>Transfer Lists</span>
+                <span
+                  className={`ms-3 font-bold ${
+                    activeItem === "transfer" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  Transfer Lists
+                </span>
               </Link>
             </li>
-            <li className={`rounded-xl ${activeItem === 'location' ? 'bg-primary' : ''}`}>
-              <Link onClick={() => {
-                  setActiveItem('location');
+            <li
+              className={`rounded-xl ${
+                activeItem === "location" ? "bg-primary" : ""
+              }`}
+            >
+              <Link
+                onClick={() => {
+                  setActiveItem("location");
                   handleCloseSidebar();
                 }}
                 to="locations"
                 className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className={`size-6 ${activeItem === 'location' ? 'text-white'  : 'text-primary'}`}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className={`size-6 ${
+                    activeItem === "location" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z"
+                  />
                 </svg>
 
-
-                <span className=
-{`ms-3 font-bold ${activeItem === 'location' ? 'text-white'  : 'text-primary'}`}>Location</span>
+                <span
+                  className={`ms-3 font-bold ${
+                    activeItem === "location" ? "text-white" : "text-primary"
+                  }`}
+                >
+                  Location
+                </span>
               </Link>
+            </li>
+
+            <li onClick={handleInstall} className="cursor-pointer">
+              <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group shadow">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-6 text-primary"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                  />
+                </svg>
+                <span className="ms-3 font-bold text-primary">Install WMS</span>
+              </div>
             </li>
           </ul>
         </div>

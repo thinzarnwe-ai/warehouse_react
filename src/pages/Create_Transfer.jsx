@@ -30,58 +30,54 @@ export default function Create_StockOut() {
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
 
+  //scan data
+  useEffect(() => {
+    const scannedData = sessionStorage.getItem("scannedData");
+    const scanTarget = sessionStorage.getItem("scanTarget");
+    const savedDraft = sessionStorage.getItem("formDraft");
 
-//scan data 
-useEffect(() => {
-  const scannedData = sessionStorage.getItem("scannedData");
-  const scanTarget = sessionStorage.getItem("scanTarget");
-  const savedDraft = sessionStorage.getItem("formDraft");
+    if (scannedData && scanTarget) {
+      let updatedForm = form;
 
-  if (scannedData && scanTarget) {
-    let updatedForm = form;
-
-    if (savedDraft) {
-      try {
-        updatedForm = JSON.parse(savedDraft);
-      } catch (e) {
-        console.error("Failed to parse saved draft:", e);
+      if (savedDraft) {
+        try {
+          updatedForm = JSON.parse(savedDraft);
+        } catch (e) {
+          console.error("Failed to parse saved draft:", e);
+        }
       }
-    }
 
-    if (scanTarget === "location") {
-      const matchedOption = locationOptions.find(
-        (opt) => opt.value === scannedData
-      );
-      // console.log(matchedOption);
-      if (matchedOption) {
-        setSelectedLocation(matchedOption);
+      if (scanTarget === "location") {
+        const matchedOption = locationOptions.find(
+          (opt) => opt.value === scannedData
+        );
+        // console.log(matchedOption);
+        if (matchedOption) {
+          setSelectedLocation(matchedOption);
+          updatedForm = {
+            ...updatedForm,
+            location_name: matchedOption.value,
+            qty: matchedOption.qty ?? "",
+          };
+        }
+      } else if (scanTarget === "transfer_location") {
         updatedForm = {
           ...updatedForm,
-          location_name: matchedOption.value,
-          qty: matchedOption.qty ?? "",
+          transfer_location: scannedData,
+        };
+      } else if (scanTarget === "product" || scanTarget === "product_code") {
+        updatedForm = {
+          ...updatedForm,
+          product_code: scannedData,
         };
       }
-    } else if (scanTarget === "transfer_location") {
-      updatedForm = {
-        ...updatedForm,
-        transfer_location: scannedData,
-      };
-    } else if (scanTarget === "product" || scanTarget === "product_code") {
-      updatedForm = {
-        ...updatedForm,
-        product_code: scannedData,
-      };
+
+      setForm(updatedForm);
+      sessionStorage.setItem("formDraft", JSON.stringify(updatedForm));
+      sessionStorage.removeItem("scannedData");
+      sessionStorage.removeItem("scanTarget");
     }
-
-    setForm(updatedForm);
-    sessionStorage.setItem("formDraft", JSON.stringify(updatedForm));
-    sessionStorage.removeItem("scannedData");
-    sessionStorage.removeItem("scanTarget");
-  }
-}, [locationOptions]);
-
-
-
+  }, [locationOptions]);
 
   //branch selected
   useEffect(() => {
@@ -178,7 +174,7 @@ useEffect(() => {
               </label>
               <div className="flex gap-5">
                 <input
-                  type="text" readOnly
+                  type="text"
                   name="product_code"
                   value={form.product_code ?? ""}
                   onChange={handleInputChange}
@@ -209,9 +205,10 @@ useEffect(() => {
             </div>
 
             <div className="sm:col-span-3">
-              <label 
-              htmlFor="product_name"
-              className="block text-sm font-medium text-primary">
+              <label
+                htmlFor="product_name"
+                className="block text-sm font-medium text-primary"
+              >
                 Product Name <span className=" text-red-600">*</span>
               </label>
               <input
@@ -222,7 +219,7 @@ useEffect(() => {
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 btext-base text-gray-900"
               />
 
-                {errors.product_name && (
+              {errors.product_name && (
                 <p className="text-red-500">{errors.product_name[0]}</p>
               )}
             </div>
@@ -350,7 +347,7 @@ useEffect(() => {
                 type="number"
                 min="0"
                 name="transfer_qty"
-                value={form.transfer_qty ?? ""} 
+                value={form.transfer_qty ?? ""}
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
                   if (e.key === "-" || e.key === "e" || e.key === "+")

@@ -3,9 +3,12 @@ import Stock_List_md from "../components/Stock_List_md";
 import Stock_List_sm from "../components/Stock_List_sm";
 import Search from "../components/Search";
 import { useEffect, useState } from "react";
+import { useStateContext } from "../contexts/AppContext";
 
 export default function Home() {
-const [stocks, setStocks] = useState([]);
+  const { user } = useStateContext();
+  const branchId = user?.user?.branch_id;
+  const [stocks, setStocks] = useState([]);
   const [pagination, setPagination] = useState({
     current_page: 1,
     total: 0,
@@ -13,8 +16,8 @@ const [stocks, setStocks] = useState([]);
   });
 
   const [searchFilters, setSearchFilters] = useState({
-    product_code: '',
-    status: '',
+    product_code: "",
+    status: "",
   });
 
   const fetchStockData = async (page = 1) => {
@@ -23,8 +26,8 @@ const [stocks, setStocks] = useState([]);
 
       const params = new URLSearchParams({
         page: page.toString(),
-        product_code: searchFilters.product_code || '',
-        status: searchFilters.status || '',
+        product_code: searchFilters.product_code || "",
+        status: searchFilters.status || "",
       });
 
       const res = await fetch(`/api/show_all_stock?${params.toString()}`, {
@@ -51,20 +54,24 @@ const [stocks, setStocks] = useState([]);
 
   useEffect(() => {
     fetchStockData();
-  }, [searchFilters]); 
+  }, [searchFilters, branchId]);
 
   const handlePageChange = (newPage) => {
     fetchStockData(newPage);
   };
   return (
     <>
-      <Search filters={searchFilters} setFilters={setSearchFilters}/>
-      <Stock_List_md  stocks={stocks}
+      <Search filters={searchFilters} setFilters={setSearchFilters} />
+      <Stock_List_md
+        stocks={stocks}
         pagination={pagination}
-        onPageChange={handlePageChange}/>
-      <Stock_List_sm  stocks={stocks}
+        onPageChange={handlePageChange}
+      />
+      <Stock_List_sm
+        stocks={stocks}
         pagination={pagination}
-        onPageChange={handlePageChange}/>
+        onPageChange={handlePageChange}
+      />
     </>
   );
 }

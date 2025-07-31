@@ -2,8 +2,11 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { useReactToPrint } from "react-to-print";
+import { useStateContext } from "../contexts/AppContext";
 
 export default function LocationList() {
+  const { user } = useStateContext();
+  const branchId = user?.user?.branch_id;
   const componentRef = useRef(null);
   const [zone, setZone] = useState("");
   const [row, setRow] = useState("");
@@ -82,7 +85,7 @@ export default function LocationList() {
 
   useEffect(() => {
     fetchLocationData();
-  }, [zone, row, bay]);
+  }, [zone, row, bay, branchId]);
 
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);

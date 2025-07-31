@@ -21,8 +21,11 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
               <th scope="col" className="px-6 py-5">
                 Location Name
               </th>
-              <th scope="col" className="px-6 py-5">
+              <th scope="col" className="px-3 py-5">
                 Qty
+              </th>
+              <th scope='col' className='px-7 py-5'>
+                Date
               </th>
               <th scope="col" className="px-6 py-5">
                 Status
@@ -48,12 +51,13 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
               <td className="px-6">{stock.stock_tracking.product_name}</td>
               <td className="px-6 ">{stock.stock_tracking.location_name}</td>
               <td className="px-6 ">{stock.qty}</td>
+              <td className="px-6 text-sm w-40">  {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric'})}</td>
               <td className=" text-center">
                 <span className="py-1 px-2 rounded-md text-white bg-primary text-xs">
                   {stock.status}
                 </span>
               </td>
-             <td className="ps-10">
+             <td className="ps-10 flex justify-content-center gap-2 mt-5">
               <Link to={`/detail/${stock.id}`}>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -75,6 +79,7 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
                   />
                 </svg>
               </Link>
+              
             </td>
             </tr>
           );
