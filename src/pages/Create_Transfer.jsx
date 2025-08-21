@@ -304,7 +304,7 @@ export default function Create_StockOut() {
               <div className="flex gap-5">
                 <input
                   type="text"
-                  readOnly
+                
                   name="transfer_location"
                   value={form.transfer_location ?? ""}
                   onChange={handleInputChange}

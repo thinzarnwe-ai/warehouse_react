@@ -49,7 +49,7 @@ export default function Stock_List_md({stocks, pagination, onPageChange}) {
               </th>
               <td className="px-6 ">{stock.stock_tracking.product_code}</td>
               <td className="px-6">{stock.stock_tracking.product_name}</td>
-              <td className="px-6 ">{stock.stock_tracking.location_name}</td>
+              <td className="px-6 ">{stock.stock_tracking.location.location_name}</td>
               <td className="px-6 ">{stock.qty}</td>
               <td className="px-6 text-sm w-40">  {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric'})}</td>
               <td className=" text-center">

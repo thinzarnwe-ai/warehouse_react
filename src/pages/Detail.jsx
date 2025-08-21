@@ -20,7 +20,7 @@ const [stock, setStock] = useState(null);
 
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
-    console.log(json);
+    // console.log(json);
     setStock(json.data); // directly set the single item
   } catch (err) {
     console.error("Failed to load stock data:", err);

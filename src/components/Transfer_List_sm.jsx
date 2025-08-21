@@ -23,10 +23,10 @@ export default function Transfer_List_sm({ stocks, pagination, onPageChange }) {
                   {stock.stock_tracking.product_name}
                 </p>
                 <p className="text-sm text-white ">
-                  📍 {stock.stock_tracking.location_name}
+                  📍 {stock.stock_tracking.location.location_name}
                 </p>
                 <p className="text-sm text-white">
-                  📍 {stock.transfer_location}
+                  📍 {stock.location.location_name}
                 </p>
                 <p className="text-sm text-white">
                   Qty:{" "}

@@ -22,7 +22,7 @@ export default function Transfer_List_md({
                 Product Name
               </th>
               <th scope="col" className="px-6 py-5">
-                Category
+               Location Name
               </th>
               <th scope="col" className="px-6 py-5">
                 Qty
@@ -49,7 +49,7 @@ export default function Transfer_List_md({
               </th>
               <td className="px-6 py-5">{stock.stock_tracking.product_code}</td>
               <td className="px-6 py-5">{stock.stock_tracking.product_name}</td>
-              <td className="px-6 py-5">{stock.stock_tracking.location_name}</td>
+              <td className="px-6 py-5">{stock.stock_tracking.location.location_name}</td>
               <td className="px-6 py-5">{stock.qty}</td>
               <td className="px-2 py-5 ">
                 <span className="py-1 px-2 rounded-md text-xs text-white bg-primary">

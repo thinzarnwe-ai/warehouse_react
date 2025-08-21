@@ -6,6 +6,7 @@ import { useStateContext } from "../contexts/AppContext";
 
 export default function LocationList() {
   const { user } = useStateContext();
+  const isSale = user?.roles?.includes("Sale");
   const branchId = user?.user?.branch_id;
   const componentRef = useRef(null);
   const [zone, setZone] = useState("");
@@ -211,13 +212,49 @@ export default function LocationList() {
           </div>
         )}
       </div>
+
+      {isSale && (
+        <div className="hidden">
+          <div ref={componentRef} className="print-root">
+            {Array.from({
+              length: Math.ceil(selectedLocations.length / 2),
+            }).map((_, i) => {
+              const a = selectedLocations[i * 2];
+              const b = selectedLocations[i * 2 + 1];
+
+              return (
+                <div key={a.id} className="page">
+                  <div className="pair-grid">
+                    {/* Card A */}
+                    <div className="card">
+                      <QRCode value={a.location_name} size={224} />
+                      <div className="label">{a.location_name}</div>
+                    </div>
+
+                    {/* Card B (if exists) */}
+                    {b ? (
+                      <div className="card">
+                        <QRCode value={b.location_name} size={224} />
+                        <div className="label">{b.location_name}</div>
+                      </div>
+                    ) : (
+                      <div className="card placeholder" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="hidden">
         <div ref={componentRef}>
-          <div className="p-4 w-[800px]">
+          <div className="p-4 ">
             <h2 className="text-xl font-bold mb-4 text-black">
               Selected Locations
             </h2>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-5">
               {selectedLocations.map((location) => (
                 <div
                   key={location.id}

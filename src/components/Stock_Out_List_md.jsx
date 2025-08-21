@@ -94,7 +94,7 @@ export default function Stock_Out_List_md({
                     {stock.stock_tracking.product_name}
                   </td>
                   <td className="px-6 py-5">
-                    {stock.stock_tracking.location_name}
+                    {stock.stock_tracking.location.location_name}
                   </td>
                   <td className="px-6 py-5">{stock.qty}</td>
                    <td className="px-6 text-sm w-35">  {new Date(stock.created_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric'})}</td>

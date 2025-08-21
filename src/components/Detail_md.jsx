@@ -24,7 +24,7 @@ export default function Detail_md({ stock }) {
                 Location Name
               </td>
               <td className="py-3 px-4 text-gray-800">
-                {stock[0].stock_tracking.location_name}
+                {stock[0].stock_tracking.location.location_name}
               </td>
             </tr>
             <tr>

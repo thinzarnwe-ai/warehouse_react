@@ -1,4 +1,4 @@
-// 👇 This must be a forwardRef
+
 import React from "react";
 import QRCode from "react-qr-code";
 

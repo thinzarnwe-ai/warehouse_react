@@ -22,7 +22,7 @@ export default function Stock_List_sm({stocks, pagination, onPageChange}) {
                 </p>
                 <p className="text-sm text-white">{stock.product_name}</p>
                 <p className="text-sm text-white">
-                  📍 {stock.stock_tracking.location_name}
+                  📍 {stock.stock_tracking.location.location_name}
                 </p>
                 <p className="text-sm text-white">
                   Qty:{" "}

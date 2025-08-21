@@ -41,7 +41,7 @@ export default function StockIn_List() {
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const json = await res.json();
-
+      // console.log(json);
       setStocks(json.data.data);
       setPagination({
         current_page: json.data.current_page,

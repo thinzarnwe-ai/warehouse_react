@@ -194,7 +194,7 @@ export default function Create_StockIn() {
                 />
               </div>
             </div>
-
+    BGOS_B_29__10_03
             {/* Location */}
             <div className="sm:col-span-3">
               <label
@@ -210,7 +210,7 @@ export default function Create_StockIn() {
                   value={form.location_name}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
-                  readOnly
+                  
                 />
 
                 <button
