@@ -157,11 +157,7 @@ export default function Create_StockOut() {
               </label>
               <div className="flex gap-5">
                 <input
-<<<<<<< HEAD
                   type="text"
-=======
-                  type="text" 
->>>>>>> 5540f91 (udpate)
                   name="product_code"
                   value={form.product_code}
                   onChange={handleInputChange}

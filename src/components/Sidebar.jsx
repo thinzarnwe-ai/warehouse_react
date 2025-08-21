@@ -2,20 +2,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { Drawer } from "flowbite";
 import { Link, useLocation } from "react-router-dom";
 export default function Sidebar() {
-<<<<<<< HEAD
   const [activeItem, setActiveItem] = useState("home");
-=======
-  const [activeItem, setActiveItem] = useState('home');
->>>>>>> 5540f91 (udpate)
   const sidebarRef = useRef(null);
   const drawerInstanceRef = useRef(null);
   const location = useLocation();
 
-<<<<<<< HEAD
   const [deferredPrompt, setDeferredPrompt] = useState(null);
-=======
-   const [deferredPrompt, setDeferredPrompt] = useState(null);
->>>>>>> 5540f91 (udpate)
 
   useEffect(() => {
     const handler = (e) => {
@@ -37,17 +29,10 @@ export default function Sidebar() {
     } else {
       console.log("User dismissed the install prompt");
     }
-<<<<<<< HEAD
-    setDeferredPrompt(null);
-  };
-
-  useEffect(() => {
-=======
     setDeferredPrompt(null); 
   };
 
    useEffect(() => {
->>>>>>> 5540f91 (udpate)
     const sidebarElement = document.getElementById("default-sidebar");
     if (sidebarElement && !drawerInstanceRef.current) {
       drawerInstanceRef.current = new Drawer(sidebarElement, {
@@ -405,28 +390,6 @@ export default function Sidebar() {
                 </span>
               </Link>
             </li>
-<<<<<<< HEAD
-
-            <li onClick={handleInstall} className="cursor-pointer">
-              <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group shadow">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-6 text-primary"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="m9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                  />
-                </svg>
-                <span className="ms-3 font-bold text-primary">Install WMS</span>
-              </div>
-            </li>
-=======
             
             <li onClick={handleInstall} className="cursor-pointer">
             <div className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white dark:hover:bg-gray-700 group shadow">
@@ -436,7 +399,6 @@ export default function Sidebar() {
               <span className="ms-3 font-bold text-primary">Install WMS</span>
             </div>
           </li>
->>>>>>> 5540f91 (udpate)
           </ul>
         </div>
       </aside>

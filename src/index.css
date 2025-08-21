@@ -5,3 +5,60 @@
     --font-poppin: Poppins, "sens-serif";
     --color-primary: #107a8b;
 }
+
+/* @media print {
+  .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+} */
+
+@media print {
+  html, body { margin: 0; padding: 0; }
+  .print-root { padding: 0 !important; } /* kills first-page padding */
+
+  /* One "row" per page, centered */
+  .page {
+    height: 100vh;                /* exactly one paper height */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    page-break-after: always;
+  }
+
+  /* 2 columns on each page */
+  .pair-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12mm;                    /* tweak spacing */
+    width: calc(100vw - 24mm);    /* breathing room at edges */
+  }
+
+  /* Keep QR+label together; avoid Chrome flex split */
+  .card {
+    display: inline-block;        /* key for page-break-inside to work */
+    page-break-inside: avoid;
+    break-inside: avoid;
+    text-align: center;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 8mm 6mm;
+    box-shadow: 0 0 0.5mm rgba(0,0,0,0.1);
+  }
+
+  .label {
+    font-weight: 700;
+    font-size: 18pt;
+    /* margin-top: 4mm; */
+    color: black;
+    margin-left: -4px;
+  }
+
+  /* Optional: keep layout tidy if an odd number of items */
+  .placeholder {
+    visibility: hidden;
+  }
+}
+
+
+

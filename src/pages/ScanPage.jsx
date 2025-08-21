@@ -69,7 +69,7 @@ export default function ScanPage() {
 
             const barcodes = await barcodeDetector.detect(canvas);
             if (barcodes.length > 0) {
-              const scannedText = barcodes[0].rawValue;
+              let scannedText = barcodes[0].rawValue;
               if (scannedText.startsWith(']C')) {
                 scannedText = scannedText.slice(3);
               }
