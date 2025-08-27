@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Stock_Out_List_sm({
   stocks,
@@ -12,7 +13,7 @@ export default function Stock_Out_List_sm({
           const serial =
             (pagination.current_page - 1) * pagination.per_page + index + 1;
           return (
-            <div
+             <Link to={`/detail/${stock.id}`} state={{ type: "stock-out" }} 
               key={stock.id}
               className="bg-white/30 backdrop-blur-md border-l-4 border-[#fff3e1] shadow-lg rounded-xl p-4 flex justify-between items-start ring-1 ring-white/40"
               style={{ background: "rgba(255, 255, 255, 0.15)" }}
@@ -53,7 +54,7 @@ export default function Stock_Out_List_sm({
                   })}
                 </p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>

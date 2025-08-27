@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 export default function Stock_Balance_sm({stocks, pagination, onPageChange}) {
  
@@ -9,7 +10,7 @@ export default function Stock_Balance_sm({stocks, pagination, onPageChange}) {
           const serial =
             (pagination.current_page - 1) * pagination.per_page + index + 1;
           return (
-            <div
+            <Link to={`/stock_detail/${stock.id}`} state={{ type: "stock-balance" }} 
               key={stock.id}
               className="bg-white/30 backdrop-blur-md border-l-4 border-[#fff3e1] shadow-lg rounded-xl p-4 flex justify-between items-start ring-1 ring-white/40"
               style={{ background: "rgba(255, 255, 255, 0.15)" }}
@@ -42,7 +43,7 @@ export default function Stock_Balance_sm({stocks, pagination, onPageChange}) {
                    {new Date(stock.updated_at).toLocaleDateString(undefined, {year: 'numeric',month: 'short',day: 'numeric',hour: '2-digit',minute: '2-digit'})}
                 </p>
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
