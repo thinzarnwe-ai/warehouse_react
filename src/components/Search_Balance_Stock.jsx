@@ -1,60 +1,85 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function Search({ filters, setFilters }) {
+export default function Search({ filters, setFilters, onScan }) {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+    setFilters((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const startScan = (field) => {
+    // Clear any previous scan data first
+    sessionStorage.removeItem("scannedData");
+    sessionStorage.removeItem("scanTarget");
+    
     navigate(`/scan/${field}`);
+    if (onScan) onScan();
   };
 
+  useEffect(() => {
+    const handlePopState = () => {
+      const scannedData = sessionStorage.getItem("scannedData");
+      const scanTarget = sessionStorage.getItem("scanTarget");
+      
+      if (scannedData && scanTarget) {
+        const key = scanTarget === "location" ? "location_name" : "product_keyword";
+        setFilters(prev => ({
+          ...prev,
+          [key]: scannedData,
+        }));
+        
+        sessionStorage.removeItem("scannedData");
+        sessionStorage.removeItem("scanTarget");
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [setFilters]);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-10 bg-primary shadow-md p-4 md:p-6 md:me-5">
       {/* Product Code Input */}
       <div className="w-full md:w-1/2">
-        <label
-          htmlFor="product_code"
-          className="text-sm font-semibold text-white block"
-        >
+        <label htmlFor="product_code" className="text-sm font-semibold text-white block">
           Product Code / Name
         </label>
         <div className="flex gap-5">
-          <input
-            id="product_code"
-            type="text"
-            name="product_keyword"
-            value={filters.product_keyword}
-            onChange={handleChange}
-            placeholder="Enter product code or name"
-            className="mt-2 w-full py-3 px-4 border border-[#107a8b] rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#107a8b]"
+          <input 
+            id="product_code" 
+            type="text" 
+            name="product_keyword" 
+            value={filters.product_keyword} 
+            onChange={handleChange} 
+            placeholder="Enter product code or name" 
+            className="mt-2 w-full py-3 px-4 border border-[#107a8b] rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#107a8b]" 
           />
           <ScanButton onClick={() => startScan("product")} />
         </div>
       </div>
-
+      
       {/* Location Name Input */}
       <div className="w-full md:w-1/2">
-        <label
-          htmlFor="location_name"
-          className="text-sm font-semibold text-white block"
-        >
+        <label htmlFor="location_name" className="text-sm font-semibold text-white block">
           Location Name
         </label>
         <div className="flex gap-5">
-          <input
-            id="location_name"
-            type="text"
-            name="location_name"
-            value={filters.location_name}
-            onChange={handleChange}
-            placeholder="Enter location name"
-            className="mt-2 w-full py-3 px-4 border border-[#107a8b] rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#107a8b]"
+          <input 
+            id="location_name" 
+            type="text" 
+            name="location_name" 
+            value={filters.location_name} 
+            onChange={handleChange} 
+            placeholder="Enter location name" 
+            className="mt-2 w-full py-3 px-4 border border-[#107a8b] rounded-lg text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-[#107a8b]" 
           />
           <ScanButton onClick={() => startScan("location")} />
         </div>

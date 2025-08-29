@@ -1,6 +1,7 @@
-import React from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function Detail_md({ stock }) {
+  const navigate = useNavigate();
   if (!stock) return <div>Loading...</div>;
 
   return (
@@ -49,6 +50,9 @@ export default function Detail_md({ stock }) {
             </tr>
           </tbody>
         </table>
+        <button onClick={() => navigate(-1)} className="px-4 py-1 rounded-lg border mt-3 ms-3">
+          Back
+        </button>
       </div>
     </>
   );

@@ -14,6 +14,7 @@ export default function Stock_Balance() {
     total: 0,
     per_page: 10,
   });
+    const [lastScanTime, setLastScanTime] = useState(0);
 
   const [searchFilters, setSearchFilters] = useState({
     product_keyword: "",
@@ -61,30 +62,51 @@ export default function Stock_Balance() {
   };
 
   useEffect(() => {
-    const scannedData = sessionStorage.getItem("scannedData");
-    const scanTarget = sessionStorage.getItem("scanTarget");
+    const processScanData = () => {
+      const scannedData = sessionStorage.getItem("scannedData");
+      const scanTarget = sessionStorage.getItem("scanTarget");
+      
+      if (scannedData && scanTarget) {
+        const key = scanTarget === "location" ? "location_name" : "product_keyword";
+        
+        setSearchFilters(prevFilters => {
+          const newFilters = {
+            ...prevFilters,
+            [key]: scannedData,
+          };
+          
+          fetchStockData(1, newFilters);
+          return newFilters;
+        });
 
-    if (scannedData && scanTarget) {
-      const key =
-        scanTarget === "location" ? "location_name" : "product_keyword";
+        sessionStorage.removeItem("scannedData");
+        sessionStorage.removeItem("scanTarget");
+        
+        setPagination(prev => ({
+          ...prev,
+          current_page: 1,
+        }));
+        
+        setLastScanTime(Date.now());
+      }
+    };
 
-      const newFilters = {
-        ...searchFilters,
-        [key]: scannedData,
-      };
+    processScanData();
+    
+  
+    const handleStorageChange = (e) => {
+      if (e.key === "scannedData" || e.key === "scanTarget") {
+        processScanData();
+      }
+    };
 
-      setSearchFilters(newFilters); // update state
-      fetchStockData(1, newFilters); // immediate fetch
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, [fetchStockData, setPagination]); 
 
-      sessionStorage.removeItem("scannedData");
-      sessionStorage.removeItem("scanTarget");
-
-      setPagination((prev) => ({
-        ...prev,
-        current_page: 1,
-      }));
-    }
-  }, []);
 
   return (
     <>
