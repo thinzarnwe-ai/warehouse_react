@@ -1,11 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 export default function Stock_Out_List_sm({
   stocks,
   pagination,
   onPageChange,
 }) {
+  const location = useLocation();
   return (
     <>
       <div className="md:hidden space-y-4 px-4 py-4 bg-primary">
@@ -13,10 +14,19 @@ export default function Stock_Out_List_sm({
           const serial =
             (pagination.current_page - 1) * pagination.per_page + index + 1;
           return (
-             <Link to={`/detail/${stock.id}`} state={{ type: "stock-out" }} 
+            <Link
+              to={{
+                pathname: `/detail/${stock.id}`,
+                search: location.search,
+              }}
+              state={{
+                type: "stock-out",
+                from: location.pathname,
+                search: location.search,
+              }}
               key={stock.id}
               className="bg-white/30 backdrop-blur-md border-l-4 border-[#fff3e1] shadow-lg rounded-xl p-4 flex justify-between items-start ring-1 ring-white/40"
-              style={{ background: "rgba(255, 255, 255, 0.15)" }}
+              style={{ background: "rgba(255, 255 , 255, 0.15)" }}
             >
               {/* Left Side */}
               <div className="space-y-1">
