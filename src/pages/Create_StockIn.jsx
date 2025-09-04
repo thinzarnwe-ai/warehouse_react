@@ -17,6 +17,7 @@ export default function Create_StockIn() {
     product_name: "",
     qty: "",
     remark: "",
+    ratio: "",
   });
 
   const { branches, loadingBranches, startScan } = useStockForm({
@@ -56,14 +57,16 @@ export default function Create_StockIn() {
   }, [branches]);
 
   //search by porduct code fetch
-  useEffect(() => {
+ useEffect(() => {
     const fetchProductName = async () => {
       const code = form.product_code?.trim();
       if (!code) return;
 
       try {
         const token = localStorage.getItem("token");
-        const res = await fetch(`/api/product/${code}`, {
+        // console.log(selectedBranch.value);
+        const branch = selectedBranch.value;
+        const res = await fetch(`/api/get-product/${code}/${branch}`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -72,18 +75,21 @@ export default function Create_StockIn() {
 
         const json = await res.json();
         // console.log(json.data);
-        const productName = json?.data?.product_name?.product_name1 || "";
-        // console.log(productName);
+        const productName = json?.data?.product_name?.barcode_bill_name || "";
+        const ratio = json?.data?.product_name?.unit_rate || "";
+        // console.log(ratio);
 
         setForm((prev) => ({
           ...prev,
           product_name: productName,
+          ratio:ratio,
         }));
       } catch (err) {
         // console.warn("Failed to fetch product name:", err);
         setForm((prev) => ({
           ...prev,
           product_name: "",
+          ratio: "",
         }));
       }
     };
@@ -320,6 +326,25 @@ export default function Create_StockIn() {
                 </ul>
               </div>
             )}
+
+
+            {/* Ratio */}
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="product_name"
+                className="block text-sm font-medium text-primary"
+              >
+                Ratio <span className="text-red-600">*</span>
+              </label>
+              <input
+               onChange={handleInputChange} readOnly
+                type="text"
+                name="ratio"
+                value={form.ratio}
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
+              />
+           
+            </div>
 
             {/* Quantity */}
             <div className="sm:col-span-3">
