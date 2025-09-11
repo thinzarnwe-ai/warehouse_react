@@ -9,8 +9,6 @@ export default function Create_StockIn() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
-  const [nameSuggestions, setNameSuggestions] = useState([]);
-  const [isTyping, setIsTyping] = useState(false);
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -18,6 +16,7 @@ export default function Create_StockIn() {
     qty: "",
     remark: "",
     ratio: "",
+    unit_code: "",
   });
 
   const { branches, loadingBranches, startScan } = useStockForm({
@@ -60,12 +59,14 @@ export default function Create_StockIn() {
  useEffect(() => {
     const fetchProductName = async () => {
       const code = form.product_code?.trim();
+      const branch = selectedBranch?.value;
       if (!code) return;
+      if (!branch) return;
 
       try {
         const token = localStorage.getItem("token");
         // console.log(selectedBranch.value);
-        const branch = selectedBranch.value;
+        // const branch = selectedBranch.value;
         const res = await fetch(`/api/get-product/${code}/${branch}`, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -77,12 +78,14 @@ export default function Create_StockIn() {
         // console.log(json.data);
         const productName = json?.data?.product_name?.barcode_bill_name || "";
         const ratio = json?.data?.product_name?.unit_rate || "";
-        // console.log(ratio);
+        const unit = json?.data?.product_name?.unit_code || "";
+        console.log(unit);
 
         setForm((prev) => ({
           ...prev,
           product_name: productName,
           ratio:ratio,
+          unit:unit,
         }));
       } catch (err) {
         // console.warn("Failed to fetch product name:", err);
@@ -90,12 +93,13 @@ export default function Create_StockIn() {
           ...prev,
           product_name: "",
           ratio: "",
+          unit: "",
         }));
       }
     };
 
     fetchProductName();
-  }, [form.product_code]);
+  }, [form.product_code, selectedBranch?.value]);
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "product_name") {
@@ -105,34 +109,34 @@ export default function Create_StockIn() {
   };
 
   //search by product name
-  useEffect(() => {
-    const name = form.product_name?.trim();
-    // console.log(name);
-    if (!name) {
-      setNameSuggestions([]);
-      return;
-    }
+  // useEffect(() => {
+  //   const name = form.product_name?.trim();
+  //   // console.log(name);
+  //   if (!name) {
+  //     setNameSuggestions([]);
+  //     return;
+  //   }
 
-    const delayDebounce = setTimeout(async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/product_name/${name}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
+  //   const delayDebounce = setTimeout(async () => {
+  //     try {
+  //       const token = localStorage.getItem("token");
+  //       const res = await fetch(`/api/product_name/${name}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           Accept: "application/json",
+  //         },
+  //       });
 
-        const json = await res.json();
-        // console.log(json);
-        setNameSuggestions(json?.data?.product_name || []);
-      } catch (err) {
-        setNameSuggestions([]);
-      }
-    }, 300);
+  //       const json = await res.json();
+  //       // console.log(json);
+  //       setNameSuggestions(json?.data?.product_name || []);
+  //     } catch (err) {
+  //       setNameSuggestions([]);
+  //     }
+  //   }, 300);
 
-    return () => clearTimeout(delayDebounce);
-  }, [form.product_name]);
+  //   return () => clearTimeout(delayDebounce);
+  // }, [form.product_name]);
 
   // console.log(nameSuggestions);
 
@@ -216,7 +220,7 @@ export default function Create_StockIn() {
                   value={form.location_name}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
-                  readOnly
+                  
                 />
 
                 <button
@@ -303,29 +307,7 @@ export default function Create_StockIn() {
               )}
             </div>
 
-            {isTyping && nameSuggestions.length > 0 && (
-              <div className="sm:col-span-3 relative">
-                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
-                  {nameSuggestions.map((item) => (
-                    <li
-                      key={item.product_code}
-                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
-                      onClick={() => {
-                        setIsTyping(false);
-                        setNameSuggestions([]);
-                        setForm((prev) => ({
-                          ...prev,
-                          product_name: item.product_name1,
-                          product_code: item.product_code,
-                        }));
-                      }}
-                    >
-                      {item.product_name1} ({item.product_code})
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
+           
 
 
             {/* Ratio */}
@@ -337,11 +319,29 @@ export default function Create_StockIn() {
                 Ratio <span className="text-red-600">*</span>
               </label>
               <input
-               onChange={handleInputChange} readOnly
+               onChange={handleInputChange} 
                 type="text"
                 name="ratio"
                 value={form.ratio}
-                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 "
+              />
+           
+            </div>
+
+             {/* Unit Code*/}
+            <div className="sm:col-span-3">
+              <label
+                htmlFor="product_name"
+                className="block text-sm font-medium text-primary"
+              >
+                Unit <span className="text-red-600">*</span>
+              </label>
+              <input
+               onChange={handleInputChange} 
+                type="text"
+                name="unit"
+                value={form.unit}
+                className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 "
               />
            
             </div>
