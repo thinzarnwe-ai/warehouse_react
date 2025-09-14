@@ -9,6 +9,8 @@ export default function Create_StockIn() {
   const [errors, setErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
+  const [nameSuggestions, setNameSuggestions] = useState([]);
+  const [isTyping, setIsTyping] = useState(false);
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -75,7 +77,7 @@ export default function Create_StockIn() {
         });
 
         const json = await res.json();
-        // console.log(json.data);
+        console.log(json.data);
         const productName = json?.data?.product_name?.barcode_bill_name || "";
         const ratio = json?.data?.product_name?.unit_rate || "";
         const unit = json?.data?.product_name?.unit_code || "";
@@ -108,37 +110,37 @@ export default function Create_StockIn() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  //search by product name
-  // useEffect(() => {
-  //   const name = form.product_name?.trim();
-  //   // console.log(name);
-  //   if (!name) {
-  //     setNameSuggestions([]);
-  //     return;
-  //   }
+  // search by product name
+  useEffect(() => {
+    const name = form.product_name?.trim();
+    // console.log(name);
+    if (!name) {
+      setNameSuggestions([]);
+      return;
+    }
 
-  //   const delayDebounce = setTimeout(async () => {
-  //     try {
-  //       const token = localStorage.getItem("token");
-  //       const res = await fetch(`/api/product_name/${name}`, {
-  //         headers: {
-  //           Authorization: `Bearer ${token}`,
-  //           Accept: "application/json",
-  //         },
-  //       });
+    const delayDebounce = setTimeout(async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(`/api/product_name/${name}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: "application/json",
+          },
+        });
 
-  //       const json = await res.json();
-  //       // console.log(json);
-  //       setNameSuggestions(json?.data?.product_name || []);
-  //     } catch (err) {
-  //       setNameSuggestions([]);
-  //     }
-  //   }, 300);
+        const json = await res.json();
+        // console.log(json);
+        setNameSuggestions(json?.data?.product_name || []);
+      } catch (err) {
+        setNameSuggestions([]);
+      }
+    }, 300);
 
-  //   return () => clearTimeout(delayDebounce);
-  // }, [form.product_name]);
+    return () => clearTimeout(delayDebounce);
+  }, [form.product_name]);
 
-  // console.log(nameSuggestions);
+  console.log(nameSuggestions);
 
   //form submit
   const handleSubmit = async (e) => {
@@ -287,7 +289,7 @@ export default function Create_StockIn() {
               )}
             </div>
 
-            {/* Product Name */}
+          {/* Product Name */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="product_name"
@@ -307,6 +309,29 @@ export default function Create_StockIn() {
               )}
             </div>
 
+            {isTyping && nameSuggestions.length > 0 && (
+              <div className="sm:col-span-3 relative">
+                <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">
+                  {nameSuggestions.map((item) => (
+                    <li
+                      key={item.product_code}
+                      className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => {
+                        setIsTyping(false);
+                        setNameSuggestions([]);
+                        setForm((prev) => ({
+                          ...prev,
+                          product_name: item.product_name1,
+                          product_code: item.product_code,
+                        }));
+                      }}
+                    >
+                      {item.product_name1} ({item.product_code})
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
            
 
 
