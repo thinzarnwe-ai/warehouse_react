@@ -1,4 +1,4 @@
-/* @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap'); */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 @import 'flowbite';
 @theme{
@@ -6,37 +6,31 @@
     --color-primary: #107a8b;
 }
 
-/* @media print {
-  .break-inside-avoid {
-    break-inside: avoid;
-    page-break-inside: avoid;
-  }
-} */
+
 
 @media print {
   html, body { margin: 0; padding: 0; }
-  .print-root { padding: 0 !important; } /* kills first-page padding */
+  .print-root { padding: 0 !important; } 
 
-  /* One "row" per page, centered */
+  
   .page {
-    height: 100vh;                /* exactly one paper height */
+    height: 100vh;              
     display: flex;
     align-items: center;
     justify-content: center;
     page-break-after: always;
   }
 
-  /* 2 columns on each page */
   .pair-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12mm;                    /* tweak spacing */
-    width: calc(100vw - 24mm);    /* breathing room at edges */
+    gap: 12mm;                    
+    width: calc(100vw - 24mm);   
   }
 
-  /* Keep QR+label together; avoid Chrome flex split */
+  
   .card {
-    display: inline-block;        /* key for page-break-inside to work */
+    display: inline-block;       
     page-break-inside: avoid;
     break-inside: avoid;
     text-align: center;
@@ -54,7 +48,6 @@
     margin-left: -4px;
   }
 
-  /* Optional: keep layout tidy if an odd number of items */
   .placeholder {
     visibility: hidden;
   }

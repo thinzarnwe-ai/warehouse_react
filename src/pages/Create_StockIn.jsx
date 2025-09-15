@@ -58,7 +58,7 @@ export default function Create_StockIn() {
   }, [branches]);
 
   //search by porduct code fetch
- useEffect(() => {
+  useEffect(() => {
     const fetchProductName = async () => {
       const code = form.product_code?.trim();
       const branch = selectedBranch?.value;
@@ -77,7 +77,7 @@ export default function Create_StockIn() {
         });
 
         const json = await res.json();
-        console.log(json.data);
+        // console.log(json.data);
         const productName = json?.data?.product_name?.barcode_bill_name || "";
         const ratio = json?.data?.product_name?.unit_rate || "";
         const unit = json?.data?.product_name?.unit_code || "";
@@ -86,8 +86,8 @@ export default function Create_StockIn() {
         setForm((prev) => ({
           ...prev,
           product_name: productName,
-          ratio:ratio,
-          unit:unit,
+          ratio: ratio,
+          unit: unit,
         }));
       } catch (err) {
         // console.warn("Failed to fetch product name:", err);
@@ -140,7 +140,7 @@ export default function Create_StockIn() {
     return () => clearTimeout(delayDebounce);
   }, [form.product_name]);
 
-  console.log(nameSuggestions);
+  // console.log(nameSuggestions);
 
   //form submit
   const handleSubmit = async (e) => {
@@ -222,7 +222,7 @@ export default function Create_StockIn() {
                   value={form.location_name}
                   onChange={handleInputChange}
                   className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200"
-                  
+                  readOnly
                 />
 
                 <button
@@ -289,7 +289,7 @@ export default function Create_StockIn() {
               )}
             </div>
 
-          {/* Product Name */}
+            {/* Product Name */}
             <div className="sm:col-span-3">
               <label
                 htmlFor="product_name"
@@ -332,8 +332,6 @@ export default function Create_StockIn() {
                 </ul>
               </div>
             )}
-           
-
 
             {/* Ratio */}
             <div className="sm:col-span-3">
@@ -344,16 +342,15 @@ export default function Create_StockIn() {
                 Ratio <span className="text-red-600">*</span>
               </label>
               <input
-               onChange={handleInputChange} 
+                onChange={handleInputChange}
                 type="text"
                 name="ratio"
                 value={form.ratio}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 "
               />
-           
             </div>
 
-             {/* Unit Code*/}
+            {/* Unit Code*/}
             <div className="sm:col-span-3">
               <label
                 htmlFor="product_name"
@@ -362,13 +359,12 @@ export default function Create_StockIn() {
                 Unit <span className="text-red-600">*</span>
               </label>
               <input
-               onChange={handleInputChange} 
+                onChange={handleInputChange}
                 type="text"
                 name="unit"
                 value={form.unit}
                 className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 "
               />
-           
             </div>
 
             {/* Quantity */}
