@@ -47,10 +47,10 @@ export default function Sidebar() {
 
     if (type) {
       setActiveItem(type);
-    } else if (path.includes("stock_in_lists")) setActiveItem("stock-in");
-    else if (path.includes("stock_out_lists")) setActiveItem("stock-out");
-    else if (path.includes("transfer_lists")) setActiveItem("transfer");
-    else if (path.includes("locations")) setActiveItem("location");
+    } else if (path.includes("stock_in_lists") || path.includes("create_stockin")) setActiveItem("stock-in");
+    else if (path.includes("stock_out_lists") || path.includes("create_stockout")) setActiveItem("stock-out");
+    else if (path.includes("transfer_lists") || path.includes("create_transfer")) setActiveItem("transfer");
+    else if (path.includes("locations") || path.includes("create_location")) setActiveItem("location");
     else if (path.includes("stock_balance_lists"))
       setActiveItem("stock-balance");
     else setActiveItem("home");

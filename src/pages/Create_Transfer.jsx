@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 export default function Create_StockOut() {
   const [errors, setErrors] = useState({});
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [isActive, setIsActive] = useState(document.hasFocus());
   const [isTyping, setIsTyping] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
@@ -29,6 +30,56 @@ export default function Create_StockOut() {
     setSelectedLocation,
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
+
+  const [buffer, setBuffer] = useState("");
+  const [lastTime, setLastTime] = useState(0);
+
+  useEffect(() => {
+    const handleFocus = () => setIsActive(true);
+    const handleBlur = () => setIsActive(false);
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentTime = new Date().getTime();
+
+      if (currentTime - lastTime > 100) {
+        setBuffer("");
+      }
+
+      if (e.key === "Enter") {
+        console.log(buffer);
+
+        const isDecimal = /^\d+$/.test(buffer[0]);
+        if (isDecimal) {
+          setForm((prev) => ({ ...prev, product_code: buffer }))
+            .then(() => setBuffer(""));
+        } else {
+          const fixedLocationName = buffer.replace(/Shift/g, '');
+          setForm((prev) => ({ ...prev, transfer_location: fixedLocationName }))
+            .then(() => setBuffer(""));
+        }
+
+      } else {
+        setBuffer((prev) => prev + e.key);
+      }
+
+      setLastTime(currentTime);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [buffer, lastTime]);
 
   //scan data
   useEffect(() => {
@@ -138,6 +189,8 @@ export default function Create_StockOut() {
         <div className="md:h-15 h-15 flex items-end justify-center rounded">
           <h2 className="text-2xl font-bold text-white">Change Location</h2>
         </div>
+
+        {!isActive && <div className="flex justify-end me-10" style={{ color: "white", marginBottom: 20 }}>Cursor ထွက်နေပါသဖြင့် scanner အားအသုံးပြု၍ရနိုင်မည်မဟုတ်ပါ</div>}
 
         <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -253,6 +306,7 @@ export default function Create_StockOut() {
                 From Location <span className=" text-red-600">*</span>
               </label>
               <Select
+              isSearchable={false}
                 options={locationOptions}
                 value={selectedLocation}
                 onChange={(selected) => {

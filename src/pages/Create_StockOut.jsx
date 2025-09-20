@@ -6,6 +6,7 @@ import { useStockForm } from "../custom_hooks/useStockForm";
 
 export default function Create_StockOut() {
   const [selectedBranch, setSelectedBranch] = useState(null);
+  const [isActive, setIsActive] = useState(document.hasFocus());
   const [errors, setErrors] = useState({});
   const [isTyping, setIsTyping] = useState(false)
   const navigate = useNavigate();
@@ -35,23 +36,73 @@ export default function Create_StockOut() {
     startScan,
   } = useStockForm({ form, setForm, selectedBranch });
 
-    //Scan QR // Bar Code
+  const [buffer, setBuffer] = useState("");
+  const [lastTime, setLastTime] = useState(0);
+
   useEffect(() => {
-  
+    const handleFocus = () => setIsActive(true);
+    const handleBlur = () => setIsActive(false);
+
+    window.addEventListener("focus", handleFocus);
+    window.addEventListener("blur", handleBlur);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      window.removeEventListener("blur", handleBlur);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentTime = new Date().getTime();
+
+      if (currentTime - lastTime > 100) {
+        setBuffer("");
+      }
+
+      if (e.key === "Enter") {
+        console.log(buffer);
+
+        // const isDecimal = /^\d+$/.test(buffer[0]);
+        // if (isDecimal) {
+          setForm((prev) => ({ ...prev, product_code: buffer }))
+            .then(() => setBuffer(""));
+        // } else {
+        //   const fixedLocationName = buffer.replace(/Shift/g, '');
+        //   setForm((prev) => ({ ...prev, location_name: fixedLocationName }))
+        //     .then(() => setBuffer(""));
+        // }
+
+      } else {
+        setBuffer((prev) => prev + e.key);
+      }
+
+      setLastTime(currentTime);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [buffer, lastTime]);
+
+  //Scan QR // Bar Code
+  useEffect(() => {
+
     const scannedData = sessionStorage.getItem("scannedData");
     const scanTarget = sessionStorage.getItem("scanTarget");
-  
+
     if (scannedData && scanTarget) {
       setForm((prev) => ({
         ...prev,
         [scanTarget === "location" ? "location_name" : "product_code"]: scannedData,
       }));
-  
+
       sessionStorage.removeItem("scannedData");
       sessionStorage.removeItem("scanTarget");
     }
   }, [location]);
-  
+
 
   //branch selected
   useEffect(() => {
@@ -62,13 +113,13 @@ export default function Create_StockOut() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-     if (name === "product_name") {
+    if (name === "product_name") {
       setIsTyping(true);
     }
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-// console.log(nameSuggestions);
+  // console.log(nameSuggestions);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,9 +160,9 @@ export default function Create_StockOut() {
     if (!option) {
       setForm({ ...form, remark: "" });
     } else if (option.value === "Other") {
-      setForm({ ...form, remark: "" }); 
+      setForm({ ...form, remark: "" });
     } else {
-      setForm({ ...form, remark: option.value }); 
+      setForm({ ...form, remark: option.value });
     }
   };
 
@@ -121,6 +172,8 @@ export default function Create_StockOut() {
         <div className="md:h-15 h-15 flex items-end justify-center rounded">
           <h2 className="text-2xl font-bold text-white">Stock Out Form</h2>
         </div>
+
+        {!isActive && <div className="flex justify-end me-10" style={{ color: "white", marginBottom: 20 }}>Cursor ထွက်နေပါသဖြင့် scanner အားအသုံးပြု၍ရနိုင်မည်မဟုတ်ပါ</div>}
 
         <div className="border-b border-gray-900/10 pb-12 bg-white w-full p-10 rounded-t-4xl">
           <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -195,7 +248,7 @@ export default function Create_StockOut() {
               >
                 Product Name <span className="text-red-600">*</span>
               </label>
-              <input 
+              <input
                 type="text"
                 name="product_name"
                 value={form.product_name}
@@ -207,7 +260,7 @@ export default function Create_StockOut() {
               )}
             </div>
 
-            
+
             {isTyping && nameSuggestions.length > 0 && (
               <div className="sm:col-span-3 relative">
                 <ul className="bg-white border rounded shadow-md max-h-40 overflow-auto z-50 absolute w-full">

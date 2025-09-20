@@ -79,7 +79,7 @@ export default function Stock_Out_List_md({
               return (
                 <tr
                   key={stock.id}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 text-sm"
+                  className="bg-white border-b dark:border-gray-700 border-gray-200 text-sm"
                 >
                   <th
                     scope="row"

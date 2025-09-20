@@ -40,7 +40,7 @@ export default function Transfer_List_md({
           const serial =
             (pagination.current_page - 1) * pagination.per_page + index + 1;
           return (
-              <tr key={stock.id} className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 text-sm">
+              <tr key={stock.id} className="bg-white border-b dark:border-gray-700 border-gray-200 text-sm">
               <th
                 scope="row"
                 className="px-6 py-4  text-gray-900 whitespace-nowrap dark:text-white"

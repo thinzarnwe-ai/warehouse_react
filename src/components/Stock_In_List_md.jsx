@@ -42,7 +42,7 @@ export default function Stock_In_List_md({
   return (
     <>
       <div className="relative overflow-x-auto px-4 hidden md:block min-h-screen  ">
-        <table className="w-full  text-left rtl:text-right font-poppin mt-5 shadow-2xl">
+        <table className="w-full text-left rtl:text-right font-poppin mt-5 shadow-2xl">
           <thead className=" text-gray-800 uppercase bg-gray-50 border-b border-indigo-500 ">
             <tr className="text-sm">
               <th scope="col" className="px-6 py-5">
@@ -78,7 +78,7 @@ export default function Stock_In_List_md({
               return (
                 <tr
                   key={stock.id}
-                  className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 text-sm"
+                  className="bg-white border-b dark:border-gray-700 border-gray-200 text-sm"
                 >
                   <th
                     scope="row"
