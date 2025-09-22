@@ -108,51 +108,66 @@ export default function Create_StockIn() {
     }
   }, [branches]);
 
-  //search by porduct code fetch
-  useEffect(() => {
-    const fetchProductName = async () => {
-      const code = form.product_code?.trim();
-      const branch = selectedBranch?.value;
-      if (!code) return;
-      if (!branch) return;
+//search by porduct code fetch
+ useEffect(() => {
+  const fetchProductName = async () => {
+    const code = form.product_code?.trim();
+    const branch = selectedBranch?.value;
 
-      try {
-        const token = localStorage.getItem("token");
-        // console.log(selectedBranch.value);
-        // const branch = selectedBranch.value;
-        const res = await fetch(`/api/get-product/${code}/${branch}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+    if (!code || !branch) {
+      // Reset form when cleared
+      setForm((prev) => ({
+        ...prev,
+        product_name: "",
+        ratio: "",
+        unit: "",
+      }));
+      return;
+    }
 
-        const json = await res.json();
-        // console.log(json.data);
-        const productName = json?.data?.product_name?.barcode_bill_name || "";
-        const ratio = json?.data?.product_name?.unit_rate || "";
-        const unit = json?.data?.product_name?.unit_code || "";
-        console.log(unit);
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`/api/get-product/${code}/${branch}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
 
-        setForm((prev) => ({
-          ...prev,
-          product_name: productName,
-          ratio: ratio,
-          unit: unit,
-        }));
-      } catch (err) {
-        // console.warn("Failed to fetch product name:", err);
-        setForm((prev) => ({
-          ...prev,
-          product_name: "",
-          ratio: "",
-          unit: "",
-        }));
+      const json = await res.json();
+
+      if (!res.ok) {
+        // only show toast if user *actually typed something*
+        toast.error(json.message || "Product Code not found.");
+        return;
       }
-    };
 
-    fetchProductName();
-  }, [form.product_code, selectedBranch?.value]);
+      const productName = json?.data?.product_name?.barcode_bill_name || "";
+      const ratio = json?.data?.product_name?.unit_rate || "";
+      const unit = json?.data?.product_name?.unit_code || "";
+
+      setForm((prev) => ({
+        ...prev,
+        product_name: productName,
+        ratio,
+        unit,
+      }));
+    } catch (err) {
+      setForm((prev) => ({
+        ...prev,
+        product_name: "",
+        ratio: "",
+        unit: "",
+      }));
+    }
+  };
+
+  // optional: debounce so it doesn’t fire every keystroke
+  const timeout = setTimeout(fetchProductName, 400);
+  return () => clearTimeout(timeout);
+
+}, [form.product_code, selectedBranch?.value]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     if (name === "product_name") {
