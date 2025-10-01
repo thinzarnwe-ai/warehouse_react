@@ -14,6 +14,7 @@ export default function LocationList() {
   const [bay, setBay] = useState("");
   const [locations, setLocations] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
+  const isOperationAnalystis = user?.roles?.includes("Operation Analystis");
   const [pagination, setPagination] = useState({
     current_page: 1,
     total: 0,
@@ -136,23 +137,26 @@ export default function LocationList() {
             </button>
           </div>
         </div>
-        {/* <Link
-          to="/create_location"
-          className="bg-primary py-2 px-3 text-white rounded ml-4"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            className="w-6 h-6"
-          >
-            <path
-              fillRule="evenodd"
-              d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
-              clipRule="evenodd"
-            />
-          </svg>
-        </Link> */}
+     
+      {isOperationAnalystis && (
+          <Link
+                to="/create_location"
+                className="bg-primary py-2 px-3 text-white rounded ml-4"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="w-6 h-6"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M12 3.75a.75.75 0 0 1 .75.75v6.75h6.75a.75.75 0 0 1 0 1.5h-6.75v6.75a.75.75 0 0 1-1.5 0v-6.75H4.5a.75.75 0 0 1 0-1.5h6.75V4.5a.75.75 0 0 1 .75-.75Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+            </Link>
+            )}
       </div>
 
       <div className="p-4 space-y-6">
