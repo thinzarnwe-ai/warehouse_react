@@ -136,7 +136,7 @@ export default function LocationList() {
             </button>
           </div>
         </div>
-        <Link
+        {/* <Link
           to="/create_location"
           className="bg-primary py-2 px-3 text-white rounded ml-4"
         >
@@ -152,7 +152,7 @@ export default function LocationList() {
               clipRule="evenodd"
             />
           </svg>
-        </Link>
+        </Link> */}
       </div>
 
       <div className="p-4 space-y-6">
