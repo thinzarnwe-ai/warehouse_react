@@ -160,14 +160,14 @@ export default function LocationList() {
       </div>
 
       <div className="p-4 space-y-6">
-        {/* Grid */}
+  
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
           {locations.map((location) => (
             <div
               key={location.id}
               className="border p-4 rounded-xl shadow bg-white"
             >
-              {/* ✅ Mobile view layout */}
+    
               <div className="flex justify-between items-center sm:hidden">
                 <div className="space-y-2">
                   <p className="font-bold">{location.location_name}</p>
@@ -184,7 +184,7 @@ export default function LocationList() {
                 <QRCode value={location.location_name} size={64} />
               </div>
 
-              {/* ✅ Tablet and up layout */}
+            
               <div className="hidden sm:flex justify-between items-center">
                 <div className="space-x-2 flex items-center">
                   <label className="flex items-center gap-2 text-sm text-gray-700">
@@ -197,7 +197,7 @@ export default function LocationList() {
                   </label>
                   <p className="font-bold">{location.location_name}</p>
                 </div>
-                {/* QRCode hidden in non-mobile as per your example */}
+               
               </div>
             </div>
           ))}
