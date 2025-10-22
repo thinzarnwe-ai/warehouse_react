@@ -14,7 +14,7 @@ export default function Stock_Balance() {
     total: 0,
     per_page: 10,
   });
-    const [lastScanTime, setLastScanTime] = useState(0);
+  const [lastScanTime, setLastScanTime] = useState(0);
 
   const [searchFilters, setSearchFilters] = useState({
     product_keyword: "",
@@ -24,7 +24,7 @@ export default function Stock_Balance() {
   const fetchStockData = async (page = 1, filters = searchFilters) => {
     try {
       const token = localStorage.getItem("token");
-
+      
       const params = new URLSearchParams({
         page: page.toString(),
         product_keyword: filters.product_keyword || "",
@@ -63,9 +63,9 @@ export default function Stock_Balance() {
 
   useEffect(() => {
     const processScanData = () => {
-      const scannedData = sessionStorage.getItem("scannedData");
-      const scanTarget = sessionStorage.getItem("scanTarget");
-      
+      const scannedData = sessionStorage.getItem("scanData");
+      const scanTarget = sessionStorage.getItem("scanKeyword");
+      // console.log(scanTarget,scannedData);
       if (scannedData && scanTarget) {
         const key = scanTarget === "location" ? "location_name" : "product_keyword";
         
@@ -79,8 +79,8 @@ export default function Stock_Balance() {
           return newFilters;
         });
 
-        sessionStorage.removeItem("scannedData");
-        sessionStorage.removeItem("scanTarget");
+        sessionStorage.removeItem("scanData");
+        sessionStorage.removeItem("scanKeyword");
         
         setPagination(prev => ({
           ...prev,
@@ -95,7 +95,7 @@ export default function Stock_Balance() {
     
   
     const handleStorageChange = (e) => {
-      if (e.key === "scannedData" || e.key === "scanTarget") {
+      if (e.key === "scanData" || e.key === "scanKeyword") {
         processScanData();
       }
     };

@@ -17,6 +17,7 @@ import Stock_Balance from "../pages/Stock_Balance.jsx";
 import ScanPage from "../pages/ScanPage.jsx";
 import Detail from "../pages/Detail.jsx";
 import Stock_Detail from "../pages/Stock_Detail.jsx";
+import Stock_Balance_Scan from "../pages/Stock_Balance_Scan.jsx";
 
   const router = createBrowserRouter([
     {
@@ -70,6 +71,10 @@ import Stock_Detail from "../pages/Stock_Detail.jsx";
           {
             path: "/scan/:target",
             element: <ScanPage/>
+          },
+          {
+            path: "/stock_balance_scan/:target",
+            element: <Stock_Balance_Scan/>
           }
           ,
           {

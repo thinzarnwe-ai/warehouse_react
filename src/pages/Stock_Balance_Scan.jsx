@@ -74,8 +74,8 @@ export default function ScanPage() {
               }
               setScanned(true);
               setShowHint(false);
-              sessionStorage.setItem("scannedData", scannedText);
-              sessionStorage.setItem("scanTarget", target ?? "");
+              sessionStorage.setItem("scanData", scannedText);
+              sessionStorage.setItem("scanKeyword", target ?? "");
               navigate(-1); 
             }
           } catch (e) {

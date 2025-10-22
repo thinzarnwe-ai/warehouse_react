@@ -13,37 +13,36 @@ export default function Search({ filters, setFilters, onScan }) {
   };
 
   const startScan = (field) => {
-    // Clear any previous scan data first
-    sessionStorage.removeItem("scannedData");
-    sessionStorage.removeItem("scanTarget");
+    sessionStorage.removeItem("scanData");
+    sessionStorage.removeItem("scanKeyword");
     
-    navigate(`/scan/${field}`);
+    navigate(`/stock_balance_scan/${field}`);
     if (onScan) onScan();
   };
 
-  useEffect(() => {
-    const handlePopState = () => {
-      const scannedData = sessionStorage.getItem("scannedData");
-      const scanTarget = sessionStorage.getItem("scanTarget");
-      
-      if (scannedData && scanTarget) {
-        const key = scanTarget === "location" ? "location_name" : "product_keyword";
-        setFilters(prev => ({
-          ...prev,
-          [key]: scannedData,
-        }));
+  // useEffect(() => {
+  //   const handlePopState = () => {
+  //     const scanData = sessionStorage.getItem("scanData");
+  //     const scanKeyword = sessionStorage.getItem("scanKeyword");
+  //     console.log(scanData, scanKeyword);
+  //     if (scanData && scanKeyword) {
+  //       const key = scanKeyword === "location" ? "location_name" : "product_keyword";
+  //       setFilters(prev => ({
+  //         ...prev,
+  //         [key]: scanData,
+  //       }));
         
-        sessionStorage.removeItem("scannedData");
-        sessionStorage.removeItem("scanTarget");
-      }
-    };
+  //       sessionStorage.removeItem("scanData");
+  //       sessionStorage.removeItem("scanKeyword");
+  //     }
+  //   };
 
-    window.addEventListener('popstate', handlePopState);
+  //   window.addEventListener('popstate', handlePopState);
     
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [setFilters]);
+  //   return () => {
+  //     window.removeEventListener('popstate', handlePopState);
+  //   };
+  // }, [setFilters]);
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-10 bg-primary shadow-md p-4 md:p-6 md:me-5">
