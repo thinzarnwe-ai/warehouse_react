@@ -9,6 +9,7 @@ export default function Create_StockOut() {
   const [selectedBranch, setSelectedBranch] = useState(null);
   const [isActive, setIsActive] = useState(document.hasFocus());
   const [isTyping, setIsTyping] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const [form, setForm] = useState({
     location_name: "",
@@ -148,6 +149,8 @@ export default function Create_StockOut() {
   //Submit Form
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(isSubmitting) return;
+    setIsSubmitting(true);
 
     const token = localStorage.getItem("token");
     try {
@@ -181,6 +184,8 @@ export default function Create_StockOut() {
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("An error occurred while saving form.");
+    } finally{
+      setIsSubmitting(false);
     }
   };
   return (
@@ -358,7 +363,7 @@ export default function Create_StockOut() {
               <div className="flex gap-5">
                 <input
                   type="text"
-                  readOnly
+                  
                   name="transfer_location"
                   value={form.transfer_location ?? ""}
                   onChange={handleInputChange}
@@ -438,10 +443,13 @@ export default function Create_StockOut() {
             <div className="flex items-center justify-end gap-x-6 w-full">
               <button
                 type="submit"
-                className="rounded-md bg-primary px-10 py-4 text-md font-semibold text-white shadow hover:bg-[#6ac9c9]"
+                disabled={isSubmitting}
+                className={`rounded-md bg-primary px-10 py-4 text-md font-semibold text-white shadow 
+                  ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-[#6ac9c9]"}`}
               >
-                Save
+                {isSubmitting ? "Saving..." : "Save"}
               </button>
+
             </div>
           </div>
         </div>

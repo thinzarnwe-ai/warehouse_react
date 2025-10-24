@@ -9,6 +9,7 @@ export default function Create_StockOut() {
   const [isActive, setIsActive] = useState(document.hasFocus());
   const [errors, setErrors] = useState({});
   const [isTyping, setIsTyping] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
   const SUGGESTIONS = [
     { value: "Promotion", label: "Promotion" },
@@ -63,7 +64,6 @@ export default function Create_StockOut() {
       if (e.key === "Enter") {
         console.log(buffer);
 
-        // const isDecimal = /^\d+$/.test(buffer[0]);
         // if (isDecimal) {
           setForm((prev) => ({ ...prev, product_code: buffer }))
             .then(() => setBuffer(""));
@@ -123,6 +123,8 @@ export default function Create_StockOut() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; 
+      setIsSubmitting(true);
     setErrors({});
     const token = localStorage.getItem("token");
     try {
@@ -152,7 +154,9 @@ export default function Create_StockOut() {
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("An error occurred while saving form.");
-    }
+    } finally {
+    setIsSubmitting(false); 
+  }
   };
 
   const handleSelectChange = (option) => {
@@ -391,11 +395,14 @@ export default function Create_StockOut() {
             {/* Submit Button */}
             <div className="flex items-center justify-end gap-x-6 w-full">
               <button
-                type="submit"
-                className="rounded-md bg-primary px-10 py-4 text-md font-semibold text-white shadow hover:bg-[#6ac9c9]"
-              >
-                Save
-              </button>
+              type="submit"
+              disabled={isSubmitting}
+              className={`rounded-md bg-primary px-10 py-4 text-md font-semibold text-white shadow 
+                ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-[#6ac9c9]"}`}
+            >
+              {isSubmitting ? "Saving..." : "Save"}
+            </button>
+
             </div>
           </div>
         </div>

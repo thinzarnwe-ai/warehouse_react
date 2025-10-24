@@ -12,6 +12,7 @@ export default function Create_StockIn() {
   const location = useLocation();
   const [nameSuggestions, setNameSuggestions] = useState([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -137,7 +138,6 @@ export default function Create_StockIn() {
       const json = await res.json();
 
       if (!res.ok) {
-        // only show toast if user *actually typed something*
         toast.error(json.message || "Product Code not found.");
         return;
       }
@@ -162,7 +162,6 @@ export default function Create_StockIn() {
     }
   };
 
-  // optional: debounce so it doesn’t fire every keystroke
   const timeout = setTimeout(fetchProductName, 400);
   return () => clearTimeout(timeout);
 
@@ -211,6 +210,8 @@ export default function Create_StockIn() {
   //form submit
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if(isSubmitting) return;
+    setIsSubmitting(true);
     setErrors({});
     const token = localStorage.getItem("token");
     try {
@@ -239,6 +240,8 @@ export default function Create_StockIn() {
       }
     } catch (error) {
       toast.error("An error occurred while saving form.");
+    }finally{
+      setIsSubmitting(false);
     }
   };
 
@@ -480,12 +483,15 @@ export default function Create_StockIn() {
 
             {/* Submit Button */}
             <div className="flex items-center justify-end gap-x-6 w-full">
-              <button
+             <button
                 type="submit"
-                className="rounded-md bg-primary px-10 py-3 text-md font-semibold text-white shadow hover:bg-[#6ac9c9]"
+                disabled={isSubmitting}
+                className={`rounded-md bg-primary px-10 py-4 text-md font-semibold text-white shadow 
+                  ${isSubmitting ? "opacity-50 cursor-not-allowed" : "hover:bg-[#6ac9c9]"}`}
               >
-                Save
+                {isSubmitting ? "Saving..." : "Save"}
               </button>
+
             </div>
           </div>
         </div>
