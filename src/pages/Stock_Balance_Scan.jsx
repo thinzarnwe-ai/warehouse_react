@@ -18,6 +18,7 @@ export default function ScanPage() {
   const [scanned, setScanned] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const videoRef = useRef(null);
+  const scannedRef = useRef(false);
 
   useEffect(() => {
     let stream = null;
@@ -32,56 +33,49 @@ export default function ScanPage() {
 
       try {
         stream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1920 },
-            height: { ideal: 1080 },
-          },
+          video: { facingMode: { ideal: "environment" }, width: 1920, height: 1080 },
         });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
         }
 
-    
         hintTimeout = setTimeout(() => setShowHint(true), 3000);
 
-        const barcodeDetector = new window.BarcodeDetector({
-          formats: BARCODE_FORMATS,
-        });
+        const barcodeDetector = new window.BarcodeDetector({ formats: BARCODE_FORMATS });
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
 
-        detectionInterval = setInterval(async () => {
-          if (!videoRef.current || scanned) return;
+        const detectFrame = async () => {
+          if (!videoRef.current || scannedRef.current) return;
+
           try {
             const video = videoRef.current;
             const cropY = video.videoHeight / 3;
             const cropHeight = video.videoHeight / 3;
-            const canvas = document.createElement("canvas");
             canvas.width = video.videoWidth;
             canvas.height = cropHeight;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(
-              video,
-              0, cropY, video.videoWidth, cropHeight,
-              0, 0, video.videoWidth, cropHeight      
-            );
+            ctx.drawImage(video, 0, cropY, video.videoWidth, cropHeight, 0, 0, video.videoWidth, cropHeight);
 
             const barcodes = await barcodeDetector.detect(canvas);
-            if (barcodes.length > 0) {
-              let scannedText = barcodes[0].rawValue;
-              if (scannedText.startsWith(']C')) {
-                scannedText = scannedText.slice(3);
-              }
+            if (barcodes.length > 0 && !scannedRef.current) {
+              scannedRef.current = true;
               setScanned(true);
               setShowHint(false);
+
+              let scannedText = barcodes[0].rawValue;
+              if (scannedText.startsWith("]C")) scannedText = scannedText.slice(3);
+
               sessionStorage.setItem("scanData", scannedText);
               sessionStorage.setItem("scanKeyword", target ?? "");
-              navigate(-1); 
+
+              if (navigator.vibrate) navigator.vibrate(100);
+              setTimeout(() => navigate(-1), 100);
             }
-          } catch (e) {
-           
-          }
-        }, 200);
+          } catch {}
+        };
+
+        detectionInterval = setInterval(detectFrame, 350);
       } catch (e) {
         setError("Camera access error: " + e.message);
       }
@@ -91,11 +85,18 @@ export default function ScanPage() {
 
     return () => {
       if (detectionInterval) clearInterval(detectionInterval);
-      if (stream) stream.getTracks().forEach((track) => track.stop());
       if (hintTimeout) clearTimeout(hintTimeout);
+      if (stream) {
+        try {
+          stream.getTracks().forEach((track) => track.stop());
+        } catch {}
+      }
     };
-   
-  }, [navigate, scanned, target]);
+  }, [navigate, target]);
+
+  useEffect(() => {
+    scannedRef.current = scanned;
+  }, [scanned]);
 
   return (
     <div className="relative w-screen h-screen bg-black text-white flex flex-col">
@@ -106,9 +107,9 @@ export default function ScanPage() {
         <h2 className="text-lg font-bold">Scan QR / Barcode</h2>
         <div className="w-12" />
       </div>
+
       <div className="flex-grow flex flex-col items-center justify-center">
         <div className="w-64 h-64 overflow-hidden rounded shadow bg-black flex items-center justify-center relative">
-        
           <video
             ref={videoRef}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
@@ -128,6 +129,7 @@ export default function ScanPage() {
             }}
           />
         </div>
+
         {error && <p className="mt-2 text-red-400">{error}</p>}
         <p className="mt-4 text-gray-300">
           ဘောင်အတွင်း ဘားကုဒ် သို့မဟုတ် QR ကုဒ်ကို ချိန်ညှိပါ။
