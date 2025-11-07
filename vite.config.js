@@ -33,8 +33,8 @@ export default defineConfig({
     // host: true,
     proxy:{
       '/api': {
-        target: 'https://miniwms.sdpghc.net/',
-        // target: 'http://warehouse.test/',
+        // target: 'https://miniwms.sdpghc.net/',
+        target: 'http://warehouse.test/',
         changeOrigin: true,
         headers:{
           Accept: 'application/json',

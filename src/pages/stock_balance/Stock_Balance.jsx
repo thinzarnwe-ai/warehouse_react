@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import Stock_Balance_md from "../components/Stock_Balance_md";
-import Stock_Balance_sm from "../components/Stock_Balance_sm";
-import Search_Balance_Stock from "../components/Search_Balance_Stock";
-import { useStateContext } from "../contexts/AppContext";
+import Stock_Balance_md from "../../components/Stock_Balance_md";
+import Stock_Balance_sm from "../../components/Stock_Balance_sm";
+import Search_Balance_Stock from "../../components/Search_Balance_Stock";
+import { useStateContext } from "../../contexts/AppContext";
 import { throttle } from "lodash"; 
 
 export default function Stock_Balance() {

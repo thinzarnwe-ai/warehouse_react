@@ -2,20 +2,8 @@ import { useEffect, useMemo, useState } from 'react';
 import Select from 'react-select';
 import { toast } from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import {useStateContext} from '../contexts/AppContext';
 
 export default function CreateLocation() {
-    const { user } = useStateContext();
-  
-    const defaultUser = {
-      name: "Test",
-      emp_id: "11111",
-      image: "https://via.placeholder.com/150",
-      roles: "Test",
-    };
-  const userInfo = user?.user || defaultUser;
-  const roles = user?.roles || defaultUser.roles;
-  const isSale = user?.roles?.includes("Sale");
   const [zones, setZones] = useState([]);
   const [zone, setZone] = useState(null);
 
@@ -27,9 +15,6 @@ export default function CreateLocation() {
 
   const [levels, setLevels] = useState([]);
   const [level, setLevel] = useState(null);
-
-  const [sides, setSides] = useState([]);
-  const [side, setSide] = useState(null);
 
   const [branches, setBranches] = useState([]);
   const [branch, setBranch] = useState(null);
@@ -55,7 +40,6 @@ export default function CreateLocation() {
         setZones(json.data.zones || []);
         setRows(json.data.rows || []);
         setBays(json.data.bays || []);
-        setSides(json.data.sides || []);
         setLevels(json.data.levels || []);
         setBranches(json.data.branches || []);
       } catch (err) {
@@ -71,9 +55,7 @@ export default function CreateLocation() {
   const formattedBranches = useMemo(() => formatOptions(branches), [branches]);
   const formattedZones = useMemo(() => formatOptions(zones), [zones]);
   const formattedRows = useMemo(() => formatOptions(rows), [rows]);
-  const formattedSides = useMemo(() => formatOptions(sides), [sides]);
   const formattedBays = useMemo(() => formatOptions(bays), [bays]);
-
   const formattedLevels = useMemo(() => formatOptions(levels), [levels]);
 
   const clearForm = () => {
@@ -82,7 +64,6 @@ export default function CreateLocation() {
     setRow(null);
     setBay(null);
     setLevel(null);
-    setSide(null);
   };
 
   const handleSubmit = async (e) => {
@@ -99,9 +80,8 @@ export default function CreateLocation() {
       row_id: row,
       bay_id: bay,
       level_id: level,
-      side_id: side,
     };
-    // console.log("hi");
+
     setLoading(true);
 
     try {
@@ -118,7 +98,6 @@ export default function CreateLocation() {
       });
 
       const result = await res.json();
-
       if (res.ok) {
         clearForm();
         toast.success("Location saved!");
@@ -180,15 +159,6 @@ export default function CreateLocation() {
               value={row}
               onChange={setRow}
             />
-
-               {isSale && ( <SelectField
-              label="Side"
-              inputId="side"
-              options={formattedSides}
-              value={side}
-              onChange={setSide}
-            />)} 
-             
             <SelectField
               label="Bay"
               inputId="bay"

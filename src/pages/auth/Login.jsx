@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Image from '../assets/warehouse_register.jpg';
-import { AppContext } from '../contexts/AppContext';
+import Image from '../../assets/warehouse_register.jpg';
+import { AppContext } from '../../contexts/AppContext';
 
 export default function Login() {
   const navigate = useNavigate();

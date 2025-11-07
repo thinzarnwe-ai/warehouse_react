@@ -131,37 +131,6 @@ useEffect(() => {
 }, [enableProductFetch, form.product_code, selectedBranch]);
 
 
-// search by product name
-useEffect(() => {
-    const name = form.product_name?.trim();
-    const branch = selectedBranch?.value;
-    // console.log(branch);
-    if (!name) {
-      setNameSuggestions([]);
-      return;
-    }
-
-    const delayDebounce = setTimeout(async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await fetch(`/api/product_name/${name}/${branch}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        });
-
-        const json = await res.json();
-        // console.log(json);
-        setNameSuggestions(json?.data?.product_name || []);
-      } catch (err) {
-        setNameSuggestions([]);
-      }
-    }, 300);
-
-    return () => clearTimeout(delayDebounce);
-  }, [form.product_name]);
-
   return {
     branches,
     loadingBranches,

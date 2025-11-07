@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import QRCode from "react-qr-code";
 import { useReactToPrint } from "react-to-print";
-import { useStateContext } from "../contexts/AppContext";
+import { useStateContext } from "../../contexts/AppContext";
 
 export default function LocationList() {
   const { user } = useStateContext();

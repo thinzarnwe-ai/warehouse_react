@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import StockSearch from "../components/StockSearch";
-import Transfer_List_sm from "../components/Transfer_List_sm";
-import Transfer_List_md from "../components/Transfer_List_md";
-import { useStateContext } from "../contexts/AppContext";
+import StockSearch from "../../components/StockSearch";
+import Transfer_List_sm from "../../components/Transfer_List_sm";
+import Transfer_List_md from "../../components/Transfer_List_md";
+import { useStateContext } from "../../contexts/AppContext";
 
 export default function Transfer_List() {
   const { user } = useStateContext();

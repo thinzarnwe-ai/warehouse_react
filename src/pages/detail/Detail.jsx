@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Detail_md from "../components/Detail_md";
+import Detail_md from "../../components/Detail_md";
 
 export default function Detail() {
   const { id } = useParams();
@@ -21,7 +21,7 @@ const [stock, setStock] = useState(null);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     console.log(json);
-    setStock(json.data); // directly set the single item
+    setStock(json.data); 
   } catch (err) {
     console.error("Failed to load stock data:", err);
   }

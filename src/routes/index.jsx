@@ -2,22 +2,22 @@ import {
     createBrowserRouter,
   } from "react-router-dom";
 import App from '../pages/layout/App.jsx';
-import Login from '../pages/Login.jsx';
-import Home from '../pages/Home.jsx'
-import Create_StockIn from "../pages/Create_StockIn.jsx";
-import StockOut_List from "../pages/StockOut_List.jsx"
-import Transfer_List from "../pages/Transfer_List.jsx";
-import StockIn_List from "../pages/StockIn_List.jsx";
-import Create_StockOut from "../pages/Create_StockOut.jsx";
-import Create_Transfer from "../pages/Create_Transfer.jsx";
-import Location_List from "../pages/Location_List.jsx";
-import ProfilePage from "../pages/ProfilePage.jsx";
-import Create_Location from "../pages/Create_Location.jsx";
-import Stock_Balance from "../pages/Stock_Balance.jsx";
-import ScanPage from "../pages/ScanPage.jsx";
-import Detail from "../pages/Detail.jsx";
-import Stock_Detail from "../pages/Stock_Detail.jsx";
-import Stock_Balance_Scan from "../pages/Stock_Balance_Scan.jsx";
+import Login from '../pages/auth/Login.jsx';
+import Home from '../pages/movement_transition/Home.jsx'
+import StockOut_List from "../pages/stock-out/StockOut_List.jsx"
+import Transfer_List from "../pages/transfer/Transfer_List.jsx";
+import StockIn_List from "../pages/stock-in/StockIn_List.jsx";
+import Create_StockOut from "../pages/stock-out/CreateStockOut.jsx";
+import Create_Transfer from "../pages/transfer/CreateTransfer.jsx"
+import Location_List from "../pages/locations/Location_List.jsx";
+import ProfilePage from "../pages/auth/ProfilePage.jsx";
+import Create_Location from "../pages/locations/Create_Location.jsx";
+import Stock_Balance from "../pages/stock_balance/Stock_Balance.jsx";
+import ScanPage from "../pages/scan/ScanPage.jsx";
+import Detail from "../pages/detail/Detail.jsx";
+import Stock_Detail from "../pages/stock_balance/Stock_Detail.jsx";
+import Stock_Balance_Scan from "../pages/scan/Stock_Balance_Scan.jsx";
+import Create_StockIn from "../pages/stock-in/Create_StockIn.jsx";
 
   const router = createBrowserRouter([
     {

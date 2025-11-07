@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import Stock_Detail_md from "../components/Stock_Detail_md";
+import Stock_Detail_md from "../../components/Stock_Detail_md";
 
 export default function Stock_Detail() {
   const { id } = useParams();

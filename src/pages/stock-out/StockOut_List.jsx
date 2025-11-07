@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import StockSearch from "../components/StockSearch";
-import Stock_Out_List_md from "../components/Stock_Out_List_md";
-import Stock_Out_List_sm from "../components/Stock_Out_List_sm";
-import { useStateContext } from "../contexts/AppContext";
+import StockSearch from "../../components/StockSearch"
+import Stock_Out_List_md from "../../components/Stock_Out_List_md";
+import Stock_Out_List_sm from "../../components/Stock_Out_List_sm";
+import { useStateContext } from "../../contexts/AppContext";
 
 export default function StockOut_List() {
   const { user } = useStateContext();

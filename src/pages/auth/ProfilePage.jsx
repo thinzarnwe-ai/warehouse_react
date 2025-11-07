@@ -1,5 +1,5 @@
-import { useStateContext } from "../contexts/AppContext";
-import profileImg from "../assets/profile.jpg";
+import { useStateContext } from "../../contexts/AppContext";
+import profileImg from "../../assets/profile.jpg";
 
 export default function ProfilePage() {
   const { user } = useStateContext();
