@@ -3,7 +3,7 @@ import Select from "react-select";
 
 export default function BranchSelect({ branches, loadingBranches, selectedBranch, setSelectedBranch }) {
   return (
-    <div className="w-full">
+    <div className="col-span-2 relative">
       <label className="block text-sm font-medium text-primary">
         Branch <span className="text-red-600">*</span>
       </label>

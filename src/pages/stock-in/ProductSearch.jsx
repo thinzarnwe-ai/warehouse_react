@@ -14,6 +14,11 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
   }, [form.product_code]);
   
   useEffect(() => {
+    if (!/^\d+$/.test(search)) setSearch(form.product_name || "");
+  }, [form.product_name]);
+
+
+  useEffect(() => {
     const fetchProduct = async () => {
       const branch = selectedBranch?.value;
       const keyword = search.trim();

@@ -2,7 +2,7 @@ import React from "react";
 
 export default function SubmitButton({ isSubmitting }) {
   return (
-    <div className="md:col-span-2 flex justify-end">
+    <div className="col-span-2 flex justify-end">
       <button
         type="submit"
         disabled={isSubmitting}

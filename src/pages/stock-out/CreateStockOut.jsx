@@ -3,7 +3,7 @@ import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useStockForm } from "../../custom_hooks/useStockForm"
 import BranchSelect from "./BranchSelect";
-import ProductSearchOut from "../stock-in/ProductSearch";
+import ProductSearchOut from "../stock-out/ProductSearchOut";
 import LocationSelectOut from "./LocationSelectOut";
 import QuantityFieldsOut from "./QuantityFieldsOut";
 import RemarkSelectOut from "./RemarkSelectOut";
@@ -50,7 +50,7 @@ export default function CreateStockOut() {
 
     const scannedData = sessionStorage.getItem("scannedData");
     const scanTarget = sessionStorage.getItem("scanTarget");
-    console.log(scannedData);
+    // console.log(scannedData);
     if (scannedData && scanTarget) {
       setForm((prev) => ({
         ...prev,
@@ -112,7 +112,7 @@ export default function CreateStockOut() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-100 p-4 md:p-8 flex flex-col items-center w-full min-h-screen"
+      className="bg-gray-100 p-5 "
     >
       <div className="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 bg-primary shadow rounded-3xl overflow-hidden">
 
@@ -130,8 +130,8 @@ export default function CreateStockOut() {
         )}
 
 
-        <div className="bg-white rounded-t-3xl px-4 sm:px-6 md:px-10 py-6">
-          <div className="grid grid-cols-1 md:w-3/4 mx-auto gap-4 md:gap-6">
+        <div className="grid grid-cols-2 md:w-3/4 mx-auto  gap-5 bg-white p-5 rounded-xl shadow">
+          {/* <div className="grid grid-cols-1 md:w-3/4 mx-auto gap-4 md:gap-6"> */}
 
             <BranchSelect
               branches={branches}
@@ -158,9 +158,9 @@ export default function CreateStockOut() {
             <QuantityFieldsOut form={form} setForm={setForm} errors={errors} />
 
             <RemarkSelectOut form={form} setForm={setForm} errors={errors} />
-          </div>
+          {/* </div> */}
 
-          <div className="flex justify-end sm:justify-end mt-8">
+          <div className="flex justify-end col-span-2 mt-8">
             <button
               type="submit"
               disabled={isSubmitting}

@@ -155,8 +155,7 @@ export default function Create_Transfer() {
           </div>
         )}
 
-        <div className="border-t border-gray-300 bg-white rounded-b-3xl p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+       <div className="grid grid-cols-2 md:w-3/4 mx-auto  gap-5 bg-white p-5 rounded-xl shadow">
             <BranchSelect
               branches={branches}
               loadingBranches={loadingBranches}
@@ -187,7 +186,7 @@ export default function Create_Transfer() {
             <RemarkField form={form} setForm={setForm} errors={errors} />
 
             <SubmitButton isSubmitting={isSubmitting} />
-          </div>
+          {/* </div> */}
         </div>
       </div>
     </form>

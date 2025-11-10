@@ -67,7 +67,7 @@ export default function ProductSearchTransfer({ form, setForm, selectedBranch, s
   };
 
   return (
-    <div className="sm:col-span-3 relative">
+    <div className="col-span-2 relative">
       <label className="block text-sm font-medium text-primary">
         Search Product Code / Name <span className="text-red-600">*</span>
       </label>
@@ -78,7 +78,7 @@ export default function ProductSearchTransfer({ form, setForm, selectedBranch, s
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => setIsTyping(true)}
           onBlur={() => setTimeout(() => setIsTyping(false), 200)}
-          placeholder="Enter or scan product"
+          placeholder="Enter product code or name"
           className="mt-2 border-primary w-full rounded-md px-3 py-1.5 text-base text-gray-900"
         />
         {search && (

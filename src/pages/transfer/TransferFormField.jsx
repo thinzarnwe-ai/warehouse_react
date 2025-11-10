@@ -7,8 +7,8 @@ export default function StockOutFormFields({ form, setForm, errors }) {
   };
 
  const fields = [
-  { label: "Product Code", name: "product_code", readOnly: true},
-  { label: "Product Name", name: "product_name", readOnly: true},
+  { label: "Product Code", name: "product_code", readOnly: true, colSpan: 2},
+  { label: "Product Name", name: "product_name", readOnly: true, colSpan: 2},
 ];
 
 return (
@@ -16,7 +16,11 @@ return (
     {fields.map(({ label, name, readOnly, type = "text", colSpan }) => (
       <div
         key={name}
-        
+          className={`${
+          colSpan
+            ? `col-span-${colSpan} relative` 
+            : "sm:col-span-3"
+        }`}
       >
         <label className="block text-sm font-medium text-primary">
           {label} <span className="text-red-600">*</span>

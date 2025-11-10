@@ -3,7 +3,7 @@ import React from "react";
 export default function TransferLocation({ form, setForm, errors ,startScan }) {
   return (
     <>
-     <div className="w-full md:col-span-2">
+     <div className="col-span-2 relative">
         <label
           htmlFor="transfer_location"
           className="block text-sm font-medium text-primary"
@@ -18,7 +18,7 @@ export default function TransferLocation({ form, setForm, errors ,startScan }) {
             onChange={(e) =>
             setForm((prev) => ({ ...prev, transfer_location: e.target.value }))
           }
-            className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-100" readOnly
+            className="mt-2 border-primary block w-full rounded-md px-3 py-1.5 text-base text-gray-900 bg-gray-200" readOnly
           />
 
           <button

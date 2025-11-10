@@ -4,7 +4,7 @@ export default function RemarkField({ form, setForm, errors }) {
   return (
     <>
    
-      <div className="w-full md:col-span-2">
+      <div className="col-span-2 relative">
         <label className="block text-sm font-medium text-primary">
           Remark <span className="text-red-600">*</span>
         </label>

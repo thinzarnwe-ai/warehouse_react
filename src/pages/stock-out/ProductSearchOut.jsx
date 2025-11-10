@@ -11,6 +11,7 @@ export default function ProductSearchOut({ form, setForm, selectedBranch, startS
       }
     }, [form.product_code]);
   
+ 
   useEffect(() => {
     if (!/^\d+$/.test(search)) {
       setSearch(form.product_name || "");
@@ -40,6 +41,7 @@ export default function ProductSearchOut({ form, setForm, selectedBranch, startS
       return;
     }
 
+      if (keyword.length < 2) return setSuggestions([]);
     const fetchSuggestions = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -68,12 +70,13 @@ export default function ProductSearchOut({ form, setForm, selectedBranch, startS
       qty: "",
     }));
     setSuggestions([]);
+    sessionStorage.removeItem("formDraft");
   };
 
   return (
     <div className="col-span-2 relative">
       <label className="block text-sm font-medium text-primary">
-        Product Code / Name <span className="text-red-600">*</span>
+       Search by Product Code / Name <span className="text-red-600">*</span>
       </label>
 
       <div className="flex gap-3 relative">

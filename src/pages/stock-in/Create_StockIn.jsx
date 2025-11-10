@@ -89,7 +89,7 @@ export default function CreateStockIn() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-5 bg-gray-100">
+    <form onSubmit={handleSubmit} className="p-5 bg-gray-100 ">
       <div className="w-full md:w-3/4 lg:w-2/3 xl:w-1/2 bg-primary shadow rounded-3xl overflow-hidden">
         <div className="flex items-center justify-center py-4 md:py-6 bg-primary text-white">
       <h2 className="text-lg md:text-2xl font-bold text-center">
