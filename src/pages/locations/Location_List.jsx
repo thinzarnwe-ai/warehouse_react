@@ -274,6 +274,8 @@ export default function LocationList() {
         </div>
       )}
 
+      {!isSale && (
+
       <div className="hidden">
         <div ref={componentRef}>
           <div className="p-4 ">
@@ -296,6 +298,7 @@ export default function LocationList() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Pagination */}
       <div className="mt-6 flex justify-center gap-4">
