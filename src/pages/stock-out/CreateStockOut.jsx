@@ -56,15 +56,13 @@ export default function CreateStockOut() {
 
         const isDecimal = /^\d+$/.test(buffer[0]);
         if (isDecimal) {
-          setForm((prev) => ({ ...prev, product_code: buffer })).then(() =>
-            setBuffer("")
-          );
+          setForm((prev) => ({ ...prev, product_code: buffer }));
         } else {
           const fixedLocationName = buffer.replace(/Shift/g, "");
           setForm((prev) => ({
             ...prev,
             location_name: fixedLocationName,
-          })).then(() => setBuffer(""));
+          }));
         }
       } else {
         setBuffer((prev) => prev + e.key);
