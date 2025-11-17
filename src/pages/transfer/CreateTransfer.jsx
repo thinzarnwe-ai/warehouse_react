@@ -20,6 +20,9 @@ export default function Create_Transfer() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
+  const [buffer, setBuffer] = useState("");
+  const [lastTime, setLastTime] = useState(0);
+
   const [form, setForm] = useState({
     location_name: "",
     product_code: "",
@@ -51,10 +54,46 @@ export default function Create_Transfer() {
   }, []);
 
   useEffect(() => {
+    const handleKeyDown = (e) => {
+      const currentTime = new Date().getTime();
+
+      if (currentTime - lastTime > 100) {
+        setBuffer("");
+      }
+
+      if (e.key === "Enter") {
+        console.log(buffer);
+
+        const isDecimal = /^\d+$/.test(buffer[0]);
+        if (isDecimal) {
+          setForm((prev) => ({ ...prev, product_code: buffer })).then(() =>
+            setBuffer("")
+          );
+        } else {
+          const fixedLocationName = buffer.replace(/Shift/g, "");
+          setForm((prev) => ({
+            ...prev,
+            location_name: fixedLocationName,
+          })).then(() => setBuffer(""));
+        }
+      } else {
+        setBuffer((prev) => prev + e.key);
+      }
+
+      setLastTime(currentTime);
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [buffer, lastTime]);
+
+  useEffect(() => {
     if (branches.length > 0 && !selectedBranch) setSelectedBranch(branches[0]);
   }, [branches]);
 
- useEffect(() => {
+  useEffect(() => {
     const scannedData = sessionStorage.getItem("scannedData");
     const scanTarget = sessionStorage.getItem("scanTarget");
     const savedDraft = sessionStorage.getItem("formDraft");
@@ -101,12 +140,11 @@ export default function Create_Transfer() {
       sessionStorage.removeItem("scanTarget");
     }
   }, [locationOptions]);
-  
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,37 +193,46 @@ export default function Create_Transfer() {
           </div>
         )}
 
-       <div className="grid grid-cols-2 md:w-3/4 mx-auto  gap-5 bg-white p-5 rounded-xl shadow">
-            <BranchSelect
-              branches={branches}
-              loadingBranches={loadingBranches}
-              selectedBranch={selectedBranch}
-              setSelectedBranch={setSelectedBranch}
-            />
+        <div className="grid grid-cols-2 md:w-3/4 mx-auto  gap-5 bg-white p-5 rounded-xl shadow">
+          <BranchSelect
+            branches={branches}
+            loadingBranches={loadingBranches}
+            selectedBranch={selectedBranch}
+            setSelectedBranch={setSelectedBranch}
+          />
 
-            <ProductSearchTransfer
-              form={form}
-              setForm={setForm}
-              selectedBranch={selectedBranch}
-              startScan={startScan}
-            />
+          <ProductSearchTransfer
+            form={form}
+            setForm={setForm}
+            selectedBranch={selectedBranch}
+            startScan={startScan}
+          />
 
-            <TransferFormFields form={form} setForm={setForm} errors={errors} />
-            <LocationSelectTransfer
-              form={form}
-              setForm={setForm}
-              selectedLocation={selectedLocation}
-              setSelectedLocation={setSelectedLocation}
-              locationOptions={locationOptions}
-              errors={errors}
-            />
+          <TransferFormFields form={form} setForm={setForm} errors={errors} />
+          <LocationSelectTransfer
+            form={form}
+            setForm={setForm}
+            selectedLocation={selectedLocation}
+            setSelectedLocation={setSelectedLocation}
+            locationOptions={locationOptions}
+            errors={errors}
+          />
 
-            <TransferQuantityFields form={form} setForm={setForm} errors={errors} />
+          <TransferQuantityFields
+            form={form}
+            setForm={setForm}
+            errors={errors}
+          />
 
-            <TransferLocation form={form} setForm={setForm} errors={errors} startScan={startScan} />
-            <RemarkField form={form} setForm={setForm} errors={errors} />
+          <TransferLocation
+            form={form}
+            setForm={setForm}
+            errors={errors}
+            startScan={startScan}
+          />
+          <RemarkField form={form} setForm={setForm} errors={errors} />
 
-            <SubmitButton isSubmitting={isSubmitting} />
+          <SubmitButton isSubmitting={isSubmitting} />
           {/* </div> */}
         </div>
       </div>
