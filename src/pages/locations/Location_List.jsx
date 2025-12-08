@@ -88,6 +88,8 @@ export default function LocationList() {
   useEffect(() => {
     fetchLocationData();
   }, [zone, row, bay, branchId]);
+  
+  const printUser = user?.user?.emp_id == "003-001055";
 
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);
@@ -240,6 +242,40 @@ export default function LocationList() {
       </div> */}
 
          {isSale && (
+        <div className="hidden">
+          <div ref={componentRef} className="print-root">
+            {Array.from({
+              length: Math.ceil(selectedLocations.length / 2),
+            }).map((_, i) => {
+              const a = selectedLocations[i * 2];
+              const b = selectedLocations[i * 2 + 1];
+
+              return (
+                <div key={a.id} className="page">
+                  <div className="pair-grid">
+                    {/* Card A */}
+                    <div className="card">
+                      <QRCode value={a.location_name} size={224} />
+                      <div className="label">{a.location_name}</div>
+                    </div>
+
+                    {/* Card B (if exists) */}
+                    {b ? (
+                      <div className="card">
+                        <QRCode value={b.location_name} size={224} />
+                        <div className="label">{b.location_name}</div>
+                      </div>
+                    ) : (
+                      <div className="card placeholder" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+      {printUser && (
         <div className="hidden">
           <div ref={componentRef} className="print-root">
             {Array.from({
