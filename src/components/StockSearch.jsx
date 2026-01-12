@@ -1,9 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import {useStateContext} from '../contexts/AppContext'
 
 export default function StockSearch({ filters, setFilters }) {
   const location = useLocation();
   const path = location.pathname;
+  const { user } = useStateContext();
+  const isOperationAnalystis = user?.roles?.includes("Operation Analystis");
 
   let route = '/create_stockin';
   if (path === '/stock_out_lists') route = '/create_stockout';
@@ -58,7 +61,7 @@ export default function StockSearch({ filters, setFilters }) {
         </div>
       </div>
 
-      <Link to={route} className="bg-[#fff] py-2 px-3 text-primary rounded">
+{!isOperationAnalystis &&  <Link to={route} className="bg-[#fff] py-2 px-3 text-primary rounded">
         <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="size-6" viewBox="0 0 24 24">
           <path
             fillRule="evenodd"
@@ -66,7 +69,8 @@ export default function StockSearch({ filters, setFilters }) {
             clipRule="evenodd"
           />
         </svg>
-      </Link>
+      </Link>}
+     
     </div>
   );
 }

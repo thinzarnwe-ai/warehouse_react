@@ -14,7 +14,7 @@ export default function LocationList() {
   const [bay, setBay] = useState("");
   const [locations, setLocations] = useState([]);
   const [selectedLocations, setSelectedLocations] = useState([]);
-  const isOperationAnalystis = user?.roles?.includes("Operation Analystis");
+  // const isOperationAnalystis = user?.roles?.includes("Operation Analystis");
   const [pagination, setPagination] = useState({
     current_page: 1,
     total: 0,
@@ -89,7 +89,10 @@ export default function LocationList() {
     fetchLocationData();
   }, [zone, row, bay, branchId]);
   
-  const printUser = user?.user?.emp_id == "003-001055";
+  const printUser =
+  user?.user?.emp_id === "003-001055" ||
+  user?.user?.emp_id === "001-000371"
+
 
   const handlePageChange = (newPage) => {
     fetchLocationData(newPage);
@@ -139,7 +142,7 @@ export default function LocationList() {
             </button>
           </div>
         </div>
-     
+{/*      
       {isOperationAnalystis && (
           <Link
                 to="/create_location"
@@ -158,7 +161,7 @@ export default function LocationList() {
                   />
                 </svg>
             </Link>
-            )}
+            )} */}
       </div>
 
       <div className="p-4 space-y-6">
