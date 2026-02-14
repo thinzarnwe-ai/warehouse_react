@@ -91,7 +91,8 @@ export default function LocationList() {
   
   const printUser =
   user?.user?.emp_id === "003-001055" ||
-  user?.user?.emp_id === "001-000371"
+  user?.user?.emp_id === "001-000371" ||
+  user?.user?.emp_id === "113-999999"
 
 
   const handlePageChange = (newPage) => {
