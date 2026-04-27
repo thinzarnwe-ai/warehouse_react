@@ -2,10 +2,13 @@ import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 
 export default function ProductSearch({ form, setForm, selectedBranch, startScan }) {
+  const NETWORK_ERROR_MESSAGE =
+    "Network error ကြောင့် ဖြစ်နေသည်။ branch IT ကို contact လုပ်ပေးပါ";
   const [search, setSearch] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [nameSuggestions, setNameSuggestions] = useState([]);
-  const [lastError, setLastError] = useState(""); 
+  const [lastError, setLastError] = useState("");
+  const [apiError, setApiError] = useState("");
 
   useEffect(() => {
     if (form.product_code && /^\d+$/.test(form.product_code)) {
@@ -26,6 +29,7 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
       if (!branch) return;
 
       if (!keyword) {
+        setApiError("");
         setNameSuggestions([]);
         setForm((prev) => ({
           ...prev,
@@ -48,7 +52,32 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
         });
 
         const json = await res.json();
-        const products = json?.data?.products || [];
+        if (!res.ok) {
+          const backendMessage = (json?.message || "").toLowerCase();
+          const isConnectionFailure =
+            res.status >= 500 ||
+            backendMessage.includes("database connection failed") ||
+            backendMessage.includes("connection failed");
+          const message = isConnectionFailure
+            ? NETWORK_ERROR_MESSAGE
+            : json?.message || "Failed to fetch product data";
+          setApiError(message);
+          toast.error(message);
+          setNameSuggestions([]);
+          setForm((prev) => ({
+            ...prev,
+            product_code: "",
+            product_name: "",
+            ratio: "",
+            unit_code: "",
+          }));
+          return;
+        }
+
+        setApiError("");
+        const products = Array.isArray(json?.data)
+          ? json.data
+          : json?.data?.products || [];
         if (!isNaN(keyword)) {
           if (products.length > 0) {
             const p = products[0];
@@ -86,7 +115,9 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
         }
       } catch (err) {
         console.error("Fetch error:", err);
-        toast.error("Error fetching product info");
+        const message = NETWORK_ERROR_MESSAGE;
+        setApiError(message);
+        toast.error(message);
         setForm((prev) => ({
           ...prev,
           product_code: "",
@@ -182,6 +213,10 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
           </ul>
         )}
       </div>
+
+      {apiError && (
+        <p className="mt-1 text-sm text-red-600">{apiError}</p>
+      )}
     </div>
   );
 }

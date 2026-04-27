@@ -93,7 +93,8 @@ export default function LocationList() {
   user?.user?.emp_id === "003-001055" ||
   user?.user?.emp_id === "001-000371" ||
   user?.user?.emp_id === "113-999999" ||
-  user?.user?.emp_id === "007-000011"
+  user?.user?.emp_id === "007-000011"||
+  user?.user?.emp_id === "001-000491"
 
 
   const handlePageChange = (newPage) => {
