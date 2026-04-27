@@ -95,6 +95,9 @@ export default function LocationList() {
   user?.user?.emp_id === "113-999999" ||
   user?.user?.emp_id === "007-000011"||
   user?.user?.emp_id === "001-000491"
+  
+    const smallSizePrintUser =
+  user?.user?.emp_id === "000-000167";
 
 
   const handlePageChange = (newPage) => {
@@ -247,7 +250,7 @@ export default function LocationList() {
         </div>
       </div> */}
 
-         {isSale && (
+        {isSale && (
         <div className="block">
           <div ref={componentRef} className="print-root">
             {Array.from({
@@ -324,11 +327,11 @@ export default function LocationList() {
             <h2 className="text-xl font-bold mb-4 text-black">
               Selected Locations
             </h2>
-            <div className="grid grid-cols-3 gap-5">
+             <div className="grid grid-cols-3 gap-5">
               {selectedLocations.map((location) => (
                 <div
                   key={location.id}
-                  className="border p-4 rounded-md shadow bg-white flex flex-col items-center gap-2"
+                  className={`border p-4 rounded-md shadow bg-white flex flex-col items-center gap-2 ${smallSizePrintUser ? "border-none" : ""}`}
                 >
                   <QRCode value={location.location_name} size={224} />
                   <div className="font-bold text-xl text-black">
