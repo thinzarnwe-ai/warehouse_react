@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useStockForm } from "../../custom_hooks/useStockForm";
@@ -26,6 +26,7 @@ export default function CreateStockOut() {
   const [errors, setErrors] = useState({});
   const [isActive, setIsActive] = useState(document.hasFocus());
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitLockRef = useRef(false);
   const navigate = useNavigate();
 
   const {
@@ -112,7 +113,31 @@ export default function CreateStockOut() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return;
+    if (isSubmitting || submitLockRef.current) return;
+
+    const requiredFields = [
+      { key: "location_name", label: "Location" },
+      { key: "product_code", label: "Product code" },
+      { key: "reduce_qty", label: "Out quantity" },
+      { key: "remark", label: "Remark" },
+    ];
+
+    const emptyField = requiredFields.find(({ key }) => {
+      const value = form[key];
+      return value === null || value === undefined || String(value).trim() === "";
+    });
+
+    if (emptyField) {
+      toast.error(`${emptyField.label} field is required.`);
+      return;
+    }
+
+    const payload = {
+      ...form,
+      from_branch: selectedBranch?.value,
+    };
+
+    submitLockRef.current = true;
     setIsSubmitting(true);
     setErrors({});
 
@@ -124,24 +149,28 @@ export default function CreateStockOut() {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...form,
-          from_branch: selectedBranch?.value,
-        }),
+        body: JSON.stringify(payload),
       });
 
       const result = await res.json();
-      if (res.ok) {
+      const backendMessage =
+        result?.message ||
+        result?.error ||
+        Object.values(result?.errors || {})?.flat?.()[0] ||
+        "An error occurred while saving form.";
+
+      if (res.ok && result?.success !== false) {
         toast.success("Stock Out saved successfully.");
         navigate("/stock_out_lists");
       } else {
         if (result.errors) setErrors(result.errors);
-        toast.error(result.message || "Validation failed.");
+        toast.error(backendMessage);
       }
     } catch (error) {
       console.error("Submit error:", error);
       toast.error("An error occurred while saving form.");
     } finally {
+      submitLockRef.current = false;
       setIsSubmitting(false);
     }
   };

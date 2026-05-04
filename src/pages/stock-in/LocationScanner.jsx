@@ -19,7 +19,7 @@ export default function LocationScanner({ form, setForm, startScan }) {
             setForm((prev) => ({ ...prev, location_name: e.target.value }))
           }
           className=" border-primary block w-full rounded-md px-3 py-2 text-base text-gray-900 bg-gray-200"
-          readOnly
+          
         />
         <button
           type="button"
