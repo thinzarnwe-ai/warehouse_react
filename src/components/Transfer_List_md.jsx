@@ -2,9 +2,8 @@ import React from 'react'
 import { Link } from 'react-router-dom';
 
 export default function Transfer_List_md({
-    stocks,
+  stocks,
   pagination,
-  onPageChange,
 }) {
   return (
     <>

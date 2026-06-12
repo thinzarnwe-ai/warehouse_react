@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 
+const NETWORK_ERROR_MESSAGE =
+  "Network error ကြောင့် ဖြစ်နေသည်။ branch IT ကို contact လုပ်ပေးပါ";
+
+const getProductCode = (product) =>
+  product?.barcode_code || product?.product_code || "";
+
+const getProductName = (product) =>
+  product?.barcode_bill_name ||
+  product?.product_name1 ||
+  product?.product_name ||
+  "";
+
 export default function ProductSearch({ form, setForm, selectedBranch, startScan }) {
-  const NETWORK_ERROR_MESSAGE =
-    "Network error ကြောင့် ဖြစ်နေသည်။ branch IT ကို contact လုပ်ပေးပါ";
   const [search, setSearch] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [nameSuggestions, setNameSuggestions] = useState([]);
@@ -17,7 +27,9 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
   }, [form.product_code]);
   
   useEffect(() => {
-    if (!/^\d+$/.test(search)) setSearch(form.product_name || "");
+    setSearch((prevSearch) =>
+      /^\d+$/.test(prevSearch) ? prevSearch : form.product_name || ""
+    );
   }, [form.product_name]);
 
 
@@ -44,14 +56,21 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
       const token = localStorage.getItem("token");
 
       try {
-        const res = await fetch(`/api/get-product/${keyword}/${branch}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        const res = await fetch(
+          `/api/get-product/${encodeURIComponent(keyword)}/${branch}`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-        const json = await res.json();
+        const contentType = res.headers.get("content-type") || "";
+        const json = contentType.includes("application/json")
+          ? await res.json()
+          : {};
+
         if (!res.ok) {
           const backendMessage = (json?.message || "").toLowerCase();
           const isConnectionFailure =
@@ -83,8 +102,8 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
             const p = products[0];
             setForm((prev) => ({
               ...prev,
-              product_code: p.barcode_code || "",
-              product_name: p.barcode_bill_name || "",
+              product_code: getProductCode(p),
+              product_name: getProductName(p),
               ratio: p.unit_rate || "",
               unit_code: p.unit_code || "",
             }));
@@ -131,7 +150,7 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
 
     const timeout = setTimeout(fetchProduct, 400);
     return () => clearTimeout(timeout);
-  }, [search, selectedBranch]);
+  }, [lastError, search, selectedBranch, setForm]);
 
   const handleClear = () => {
     setSearch("");
@@ -190,24 +209,22 @@ export default function ProductSearch({ form, setForm, selectedBranch, startScan
           <ul className="absolute top-full mt-1 bg-white border rounded shadow-md max-h-40 overflow-auto z-50 w-full">
             {nameSuggestions.map((item) => (
               <li
-                key={item.product_code}
+                key={getProductCode(item)}
                 className="px-3 py-1 hover:bg-gray-200 cursor-pointer"
                 onClick={() => {
                   setIsTyping(false);
                   setNameSuggestions([]);
-                  setSearch(item.barcode_bill_name || item.product_name1 || "");
+                  setSearch(getProductName(item));
                   setForm((prev) => ({
                     ...prev,
-                    product_code: item.product_code,
-                    product_name:
-                      item.barcode_bill_name || item.product_name1 || "",
+                    product_code: getProductCode(item),
+                    product_name: getProductName(item),
                     ratio: item.unit_rate,
                     unit_code: item.unit_code,
                   }));
                 }}
               >
-                {item.barcode_bill_name || item.product_name1} (
-                {item.product_code})
+                {getProductName(item)} ({getProductCode(item)})
               </li>
             ))}
           </ul>

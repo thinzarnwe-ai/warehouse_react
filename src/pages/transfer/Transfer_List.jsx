@@ -91,10 +91,6 @@ export default function Transfer_List() {
       fetchStockData(1, searchFilters);
     }, [searchFilters, branchId]);
   
-    const handleDeleteStock = (deletedId) => {
-      setStocks((prev) => prev.filter((item) => item.id !== deletedId));
-    };
-  
     const handlePageChange = (newPage) => {
       const next = new URLSearchParams(searchParams);
       next.set("page", String(newPage));

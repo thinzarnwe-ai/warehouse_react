@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useStateContext } from "../contexts/AppContext";
+import { toast } from "react-hot-toast";
 
 export default function Nav() {
-  const { user, token, setUser, setToken } = useStateContext();
+  const { user, setUser, setToken } = useStateContext();
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef();
@@ -61,8 +62,8 @@ export default function Nav() {
           },
         }));
       }
-    } catch (e) {
-      // handle error
+    } catch {
+      toast.error("Failed to update branch.");
     }
   };
 

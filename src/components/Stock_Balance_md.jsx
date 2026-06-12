@@ -1,7 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom';
 
-export default function Stock_Balance_md({stocks, pagination, onPageChange}) {
+export default function Stock_Balance_md({ stocks, pagination }) {
   
   return (
     <>
@@ -89,4 +89,3 @@ export default function Stock_Balance_md({stocks, pagination, onPageChange}) {
     </>
   )
 }
-

@@ -2,7 +2,6 @@ import React from "react";
 import Select from "react-select";
 
 export default function LocationSelectOut({
-  form,
   setForm,
   selectedLocation,
   setSelectedLocation,

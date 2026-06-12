@@ -72,7 +72,9 @@ export default function ScanPage() {
               if (navigator.vibrate) navigator.vibrate(100);
               setTimeout(() => navigate(-1), 100);
             }
-          } catch {}
+          } catch {
+            // Some frames cannot be decoded; keep scanning.
+          }
         };
 
         detectionInterval = setInterval(detectFrame, 350);
@@ -89,7 +91,9 @@ export default function ScanPage() {
       if (stream) {
         try {
           stream.getTracks().forEach((track) => track.stop());
-        } catch {}
+        } catch {
+          // Camera stream may already be stopped.
+        }
       }
     };
   }, [navigate, target]);

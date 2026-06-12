@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import Select from "react-select";
 import { useStockForm } from "../../custom_hooks/useStockForm";
 
 import BranchSelect from "./BranchSelect";
@@ -63,8 +62,6 @@ export default function Create_Transfer() {
       }
 
       if (e.key === "Enter") {
-        console.log(buffer);
-
         const isDecimal = /^\d+$/.test(buffer[0]);
         if (isDecimal) {
           setForm((prev) => ({ ...prev, product_code: buffer }));
@@ -112,7 +109,6 @@ export default function Create_Transfer() {
         const matchedOption = locationOptions.find(
           (opt) => opt.value === scannedData
         );
-        // console.log(matchedOption);
         if (matchedOption) {
           setSelectedLocation(matchedOption);
           updatedForm = {
@@ -139,11 +135,6 @@ export default function Create_Transfer() {
       sessionStorage.removeItem("scanTarget");
     }
   }, [locationOptions]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();

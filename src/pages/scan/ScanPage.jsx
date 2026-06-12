@@ -78,8 +78,8 @@ export default function ScanPage() {
               sessionStorage.setItem("scanTarget", target ?? "");
               navigate(-1); 
             }
-          } catch (e) {
-           
+          } catch {
+            // Some frames cannot be decoded; keep scanning.
           }
         }, 200);
       } catch (e) {

@@ -20,7 +20,6 @@ export default function Stock_Balance() {
     location_name: "",
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [lastScanTime, setLastScanTime] = useState(0);
 
   const latestRequest = useRef(0);
 
@@ -99,7 +98,6 @@ export default function Stock_Balance() {
         sessionStorage.removeItem("scanKeyword");
 
         setPagination((prev) => ({ ...prev, current_page: 1 }));
-        setLastScanTime(Date.now());
       }
     };
 

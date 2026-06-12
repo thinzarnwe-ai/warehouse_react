@@ -1,11 +1,13 @@
 import React from "react";
-import { useLocation,useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 export default function Detail_md({ stock }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const state = location.state || {};
   if (!stock) return <div>Loading...</div>;
-    const handleBack = () => {
+
+  const handleBack = () => {
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -62,7 +64,7 @@ export default function Detail_md({ stock }) {
           </tbody>
         </table>
 
-        <button onClick={() => navigate(-1)} className="px-4 py-1 rounded-lg border mt-3 ms-3">
+        <button onClick={handleBack} className="px-4 py-1 rounded-lg border mt-3 ms-3">
           Back
         </button>
 

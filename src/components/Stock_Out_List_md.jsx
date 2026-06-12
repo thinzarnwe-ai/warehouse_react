@@ -7,7 +7,6 @@ export default function Stock_Out_List_md({
   user,
   stocks,
   pagination,
-  onPageChange,
   onDeleteStock,
 }) {
    const [confirmId, setConfirmId] = useState(null);
@@ -27,7 +26,7 @@ export default function Stock_Out_List_md({
         try {
           const errData = await res.json();
           errorMsg = errData?.error || errData?.message || errorMsg;
-        } catch (e) {
+        } catch {
           errorMsg = res.statusText || errorMsg;
         }
         throw new Error(errorMsg);

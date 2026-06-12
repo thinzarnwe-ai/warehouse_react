@@ -5,7 +5,7 @@ import { AppContext } from '../../contexts/AppContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { token, setToken } = useContext(AppContext);
+  const { setToken } = useContext(AppContext);
   const [formData, setFormData] = useState({ emp_id: '', password: '' });
   const [errors, setErrors] = useState({});
 
@@ -41,7 +41,7 @@ export default function Login() {
       localStorage.setItem("token", data.token);
       setToken(data.token);
       navigate("/");
-    } catch (err) {
+    } catch {
       setErrors({ general: 'An unexpected error occurred.' });
     }
   };

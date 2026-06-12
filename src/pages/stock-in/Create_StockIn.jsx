@@ -56,8 +56,6 @@ export default function CreateStockIn() {
       }
 
       if (e.key === "Enter") {
-        console.log(buffer);
-
         const isDecimal = /^\d+$/.test(buffer[0]);
         if (isDecimal) {
           setForm((prev) => ({ ...prev, product_code: buffer }));
@@ -91,7 +89,7 @@ export default function CreateStockIn() {
 
     const scannedData = sessionStorage.getItem("scannedData");
     const scanTarget = sessionStorage.getItem("scanTarget");
-    console.log(scannedData);
+
     if (scannedData && scanTarget) {
       setForm((prev) => ({
         ...prev,
@@ -154,7 +152,7 @@ export default function CreateStockIn() {
         setErrors(result.errors || {});
         toast.error(backendMessage);
       }
-    } catch (err) {
+    } catch {
       toast.error("connection ကျနေပါသည် Branch IT နဲ့ ဆက်သွယ်ပေးပါ");
     } finally {
       submitLockRef.current = false;

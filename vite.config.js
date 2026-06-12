@@ -19,11 +19,6 @@ export default defineConfig({
             src: '/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
-          },
-          {
-            src: '/pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png',
           }
         ]
       }
@@ -33,8 +28,8 @@ export default defineConfig({
     // host: true,
     proxy:{
       '/api': {
-        target: 'https://miniwms.sdpghc.net/',
-        // target: 'http://warehouse.test/',
+        // target: 'https://miniwms.sdpghc.net/',
+        target: 'http://127.0.0.1:8000/',
         changeOrigin: true,
         headers:{
           Accept: 'application/json',
