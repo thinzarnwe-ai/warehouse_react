@@ -53,7 +53,7 @@ export default function CreateStockOut() {
       }
 
       if (e.key === "Enter") {
-        console.log(buffer);
+        // console.log(buffer);
 
         const isDecimal = /^\d+$/.test(buffer[0]);
         if (isDecimal) {
@@ -168,7 +168,7 @@ export default function CreateStockOut() {
       }
     } catch (error) {
       console.error("Submit error:", error);
-      toast.error("An error occurred while saving form.");
+      toast.error("connection ကျနေပါသည် Branch IT နဲ့ ဆက်သွယ်ပေးပါ");
     } finally {
       submitLockRef.current = false;
       setIsSubmitting(false);

@@ -12,7 +12,7 @@ export default function LocationScanner({ form, setForm, startScan }) {
       </label>
       <div className="flex gap-2">
         <input
-          type="text"
+          type="text" readOnly
           name="location_name"
           value={form.location_name}
           onChange={(e) =>

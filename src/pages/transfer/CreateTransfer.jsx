@@ -200,7 +200,7 @@ export default function Create_Transfer() {
       }
     } catch (err) {
       console.error("Submit error:", err);
-      toast.error("Error saving form.");
+      toast.error("connection ကျနေပါသည် Branch IT နဲ့ ဆက်သွယ်ပေးပါ");
     } finally {
       submitLockRef.current = false;
       setIsSubmitting(false);

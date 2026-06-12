@@ -155,7 +155,7 @@ export default function CreateStockIn() {
         toast.error(backendMessage);
       }
     } catch (err) {
-      toast.error("An error occurred while saving form.");
+      toast.error("connection ကျနေပါသည် Branch IT နဲ့ ဆက်သွယ်ပေးပါ");
     } finally {
       submitLockRef.current = false;
       setIsSubmitting(false);

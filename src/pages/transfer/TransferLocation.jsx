@@ -12,7 +12,7 @@ export default function TransferLocation({ form, setForm, errors ,startScan }) {
         </label>
         <div className="flex gap-5">
           <input
-            type="text"
+            type="text" readOnly
             name="transfer_location"
             value={form.transfer_location ?? ""}
             onChange={(e) =>
