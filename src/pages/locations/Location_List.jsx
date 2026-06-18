@@ -252,7 +252,7 @@ export default function LocationList() {
       </div> */}
 
         {isSale && (
-        <div className="block">
+        <div className="hidden">
           <div ref={componentRef} className="print-root">
             {Array.from({
               length: Math.ceil(selectedLocations.length / 2),
