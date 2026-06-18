@@ -96,8 +96,9 @@ export default function LocationList() {
   user?.user?.emp_id === "007-000011"||
   user?.user?.emp_id === "001-000491"
   
-    const smallSizePrintUser =
-  user?.user?.emp_id === "000-000167";
+  const smallSizePrintUser =
+  user?.user?.emp_id === "000-000167" ||
+  user?.user?.emp_id === "001-000898"
 
 
   const handlePageChange = (newPage) => {
@@ -324,9 +325,6 @@ export default function LocationList() {
       <div className="hidden">
         <div ref={componentRef}>
           <div className="p-4 ">
-            <h2 className="text-xl font-bold mb-4 text-black">
-              Selected Locations
-            </h2>
              <div className="grid grid-cols-3 gap-5">
               {selectedLocations.map((location) => (
                 <div
