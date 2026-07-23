@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useStateContext } from "../contexts/AppContext";
+import { useStateContext } from "../contexts/stateContext";
 import { toast } from "react-hot-toast";
 
 export default function Nav() {

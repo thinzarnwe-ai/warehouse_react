@@ -1,11 +1,11 @@
-import React, { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Image from '../../assets/warehouse_register.jpg';
-import { AppContext } from '../../contexts/AppContext';
+import { useStateContext } from '../../contexts/stateContext';
 
 export default function Login() {
   const navigate = useNavigate();
-  const { setToken } = useContext(AppContext);
+  const { setToken } = useStateContext();
   const [formData, setFormData] = useState({ emp_id: '', password: '' });
   const [errors, setErrors] = useState({});
 
@@ -80,6 +80,8 @@ export default function Login() {
               value={formData.emp_id}
               onChange={handleChange}
               placeholder="000-000000"
+              autoComplete="username"
+              required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
             {errors.emp_id && <p className="text-red-300">{errors.emp_id[0]}</p>}
@@ -95,20 +97,11 @@ export default function Login() {
               id="password"
               value={formData.password}
               onChange={handleChange}
+              autoComplete="current-password"
+              required
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5"
             />
             {errors.password && <p className="text-red-300">{errors.password[0]}</p>}
-          </div>
-
-          <div className="flex items-start mb-5">
-            <input
-              id="terms"
-              type="checkbox"
-              className="w-4 h-4 border border-gray-300 rounded-sm bg-gray-50 focus:ring-3 focus:ring-blue-300"
-            />
-            <label htmlFor="terms" className="ml-2 text-sm font-medium text-white">
-              I agree with the <a href="#" className="text-blue-300 hover:underline">terms and conditions</a>
-            </label>
           </div>
 
           <button

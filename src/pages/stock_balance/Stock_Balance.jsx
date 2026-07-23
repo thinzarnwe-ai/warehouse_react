@@ -1,9 +1,8 @@
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Stock_Balance_md from "../../components/Stock_Balance_md";
 import Stock_Balance_sm from "../../components/Stock_Balance_sm";
 import Search_Balance_Stock from "../../components/Search_Balance_Stock";
-import { useStateContext } from "../../contexts/AppContext";
-import { throttle } from "lodash"; 
+import { useStateContext } from "../../contexts/stateContext";
 
 export default function Stock_Balance() {
   const { user } = useStateContext();
@@ -22,10 +21,14 @@ export default function Stock_Balance() {
   const [isLoading, setIsLoading] = useState(false);
 
   const latestRequest = useRef(0);
+  const abortControllerRef = useRef(null);
 
-  const fetchStockData = async (page = 1, filters = searchFilters) => {
-    const requestId = Date.now();
+  const fetchStockData = useCallback(async (page, filters) => {
+    const requestId = latestRequest.current + 1;
     latestRequest.current = requestId;
+    abortControllerRef.current?.abort();
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
 
     try {
       setIsLoading(true);
@@ -44,6 +47,7 @@ export default function Stock_Balance() {
           Accept: "application/json",
         },
         credentials: "include",
+        signal: abortController.signal,
       });
 
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -52,8 +56,7 @@ export default function Stock_Balance() {
     
       if (latestRequest.current !== requestId) return;
       if (!json?.data?.data || !Array.isArray(json.data.data)) {
-        console.warn("⚠️ API returned null or invalid data, skipping update.");
-        return;
+        throw new Error("The server returned an invalid stock response.");
       }
 
       setStocks(json.data.data);
@@ -63,20 +66,28 @@ export default function Stock_Balance() {
         per_page: json.data.per_page ?? 10,
       });
     } catch (err) {
-      console.error("❌ Failed to load stock data:", err);
+      if (err.name !== "AbortError") {
+        console.error("Failed to load stock data:", err);
+      }
     } finally {
-      setIsLoading(false);
+      if (latestRequest.current === requestId) setIsLoading(false);
     }
-  };
-
-  const throttledFetch = useMemo(() => throttle(fetchStockData, 500), []);
+  }, []);
 
   useEffect(() => {
-    throttledFetch(1, searchFilters);
-  }, [searchFilters, branchId]);
+    const debounceTimer = window.setTimeout(
+      () => fetchStockData(1, searchFilters),
+      400,
+    );
+
+    return () => {
+      window.clearTimeout(debounceTimer);
+      abortControllerRef.current?.abort();
+    };
+  }, [branchId, fetchStockData, searchFilters]);
 
   const handlePageChange = (newPage) => {
-    fetchStockData(newPage);
+    fetchStockData(newPage, searchFilters);
   };
 
   useEffect(() => {
@@ -90,7 +101,6 @@ export default function Stock_Balance() {
 
         setSearchFilters((prev) => {
           const newFilters = { ...prev, [key]: scannedData };
-          fetchStockData(1, newFilters);
           return newFilters;
         });
 

@@ -17,8 +17,9 @@ axiosClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
+      window.dispatchEvent(new Event("auth:unauthorized"));
     }
-    throw error;
+    return Promise.reject(error);
   }
 );
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import {useStateContext} from '../contexts/AppContext'
+import {useStateContext} from '../contexts/stateContext'
 
 export default function StockSearch({ filters, setFilters }) {
   const location = useLocation();

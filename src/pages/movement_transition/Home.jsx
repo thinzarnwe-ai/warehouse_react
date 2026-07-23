@@ -3,7 +3,7 @@ import Stock_List_md from "../../components/Stock_List_md";
 import Stock_List_sm from "../../components/Stock_List_sm";
 import Search from "../../components/Search";
 import { useEffect, useState } from "react";
-import { useStateContext } from "../../contexts/AppContext";
+import { useStateContext } from "../../contexts/stateContext";
 
 export default function Home() {
   const { user } = useStateContext();

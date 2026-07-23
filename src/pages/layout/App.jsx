@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import "flowbite";
 import Sidebar from "../../components/Sidebar";
 import Nav from "../../components/Nav";
-import { useStateContext } from "../../contexts/AppContext";
+import { useStateContext } from "../../contexts/stateContext";
 import { Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 

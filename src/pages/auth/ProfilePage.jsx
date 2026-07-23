@@ -1,4 +1,4 @@
-import { useStateContext } from "../../contexts/AppContext";
+import { useStateContext } from "../../contexts/stateContext";
 import profileImg from "../../assets/profile.jpg";
 
 export default function ProfilePage() {

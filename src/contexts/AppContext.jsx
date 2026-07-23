@@ -1,36 +1,52 @@
-import { createContext, useEffect, useContext, useState } from "react";
-
-export const AppContext = createContext();
+import { useCallback, useEffect, useMemo, useState } from "react";
+import axiosClient from "../axiosClient";
+import { AppContext } from "./stateContext";
 
 export default function AppProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [user, setUser] = useState(null);
 
-  async function getUser() {
-    const res = await fetch("/api/user", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
-    // console.log(data);
-
-    if (res.ok) {
-      setUser(data);
+  const getUser = useCallback(async (signal) => {
+    if (!token) {
+      setUser(null);
+      return;
     }
-  }
 
-  useEffect(() => {
-    if (token) {
-      getUser();
+    try {
+      const response = await axiosClient.get("/api/user", { signal });
+      setUser(response.data);
+    } catch (error) {
+      if (error.code !== "ERR_CANCELED") {
+        setUser(null);
+      }
     }
   }, [token]);
 
+  useEffect(() => {
+    const abortController = new AbortController();
+    getUser(abortController.signal);
+    return () => abortController.abort();
+  }, [getUser]);
+
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      setToken(null);
+      setUser(null);
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () =>
+      window.removeEventListener("auth:unauthorized", handleUnauthorized);
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ token, setToken, user, setUser }),
+    [token, user],
+  );
+
   return (
-    <AppContext.Provider value={{ token, setToken, user, setUser }}>
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
 }
-
-export const useStateContext = () => useContext(AppContext);
